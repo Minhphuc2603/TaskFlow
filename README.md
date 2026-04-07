@@ -43,7 +43,7 @@ TaskFlow/
 ### Prerequisites
 - .NET 8 SDK
 - Node.js 18+
-- SQL Server LocalDB (or update connection string)
+- PgAdmin 4 Progest
 
 ### Backend
 ```bash
