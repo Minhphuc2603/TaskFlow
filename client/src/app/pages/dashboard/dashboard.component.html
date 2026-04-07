@@ -4,12 +4,15 @@
     <div class="sidebar-header">
       <div class="logo-row">
         <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
-          <rect width="40" height="40" rx="10" fill="url(#grd)"/>
-          <path d="M12 14h16v3H12zM12 20h10v3H12zM12 26h14v3H12z" fill="white"/>
+          <rect width="40" height="40" rx="10" fill="url(#grd)" />
+          <path
+            d="M12 14h16v3H12zM12 20h10v3H12zM12 26h14v3H12z"
+            fill="white"
+          />
           <defs>
             <linearGradient id="grd" x1="0" y1="0" x2="40" y2="40">
-              <stop stop-color="#6366f1"/>
-              <stop offset="1" stop-color="#8b5cf6"/>
+              <stop stop-color="#6366f1" />
+              <stop offset="1" stop-color="#8b5cf6" />
             </linearGradient>
           </defs>
         </svg>
@@ -20,7 +23,9 @@
     <nav class="sidebar-nav">
       <a class="nav-item active">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-          <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+          <path
+            d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"
+          />
         </svg>
         Dashboard
       </a>
@@ -30,26 +35,42 @@
       <div class="user-info">
         <div class="avatar">{{ getUserInitials() }}</div>
         <div class="user-details">
-          <span class="user-name">{{ authService.currentUser()?.fullName }}</span>
+          <span class="user-name">{{
+            authService.currentUser()?.fullName
+          }}</span>
           <span class="user-email">{{ authService.currentUser()?.email }}</span>
         </div>
       </div>
-      <button class="btn-theme-toggle" (click)="themeService.toggleTheme()" title="Đổi giao diện">
+      <button
+        class="btn-theme-toggle"
+        (click)="themeService.toggleTheme()"
+        title="Đổi giao diện"
+      >
         @if (themeService.isDarkMode()) {
           <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/>
+            <path
+              fill-rule="evenodd"
+              d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+              clip-rule="evenodd"
+            />
           </svg>
           Giao diện sáng
         } @else {
           <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+            <path
+              d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"
+            />
           </svg>
           Giao diện tối
         }
       </button>
       <button class="btn-logout" (click)="logout()">
         <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1H3zm11 4a1 1 0 10-2 0v4a1 1 0 102 0V7zm-3 1a1 1 0 10-2 0v3a1 1 0 102 0V8zM8 9a1 1 0 00-2 0v2a1 1 0 102 0V9z" clip-rule="evenodd"/>
+          <path
+            fill-rule="evenodd"
+            d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1H3zm11 4a1 1 0 10-2 0v4a1 1 0 102 0V7zm-3 1a1 1 0 10-2 0v3a1 1 0 102 0V8zM8 9a1 1 0 00-2 0v2a1 1 0 102 0V9z"
+            clip-rule="evenodd"
+          />
         </svg>
         Đăng xuất
       </button>
@@ -65,7 +86,11 @@
       </div>
       <button class="btn-create" (click)="showCreateModal.set(true)">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"/>
+          <path
+            fill-rule="evenodd"
+            d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+            clip-rule="evenodd"
+          />
         </svg>
         Dự án mới
       </button>
@@ -73,7 +98,7 @@
 
     <div class="projects-grid">
       @if (isLoading()) {
-        @for (i of [1,2,3]; track i) {
+        @for (i of [1, 2, 3]; track i) {
           <div class="project-card skeleton">
             <div class="skeleton-cover"></div>
             <div class="skeleton-text"></div>
@@ -83,37 +108,83 @@
       } @else if (projects().length === 0) {
         <div class="empty-state">
           <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-            <rect x="8" y="8" width="48" height="48" rx="12" stroke="rgba(255,255,255,0.1)" stroke-width="2" stroke-dasharray="6 4"/>
-            <path d="M32 24v16M24 32h16" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-linecap="round"/>
+            <rect
+              x="8"
+              y="8"
+              width="48"
+              height="48"
+              rx="12"
+              stroke="rgba(255,255,255,0.1)"
+              stroke-width="2"
+              stroke-dasharray="6 4"
+            />
+            <path
+              d="M32 24v16M24 32h16"
+              stroke="rgba(255,255,255,0.2)"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
           </svg>
           <h3>Chưa có dự án nào</h3>
           <p>Tạo dự án đầu tiên để bắt đầu</p>
-          <button class="btn-create" (click)="showCreateModal.set(true)">Tạo dự án</button>
+          <button class="btn-create" (click)="showCreateModal.set(true)">
+            Tạo dự án
+          </button>
         </div>
       } @else {
         @for (project of projects(); track project.id) {
           <div class="project-card" (click)="openProject(project)">
-            <button class="btn-delete-project" (click)="startDeleteProject($event, project)" title="Xóa dự án">
-              <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+            <button
+              class="btn-delete-project"
+              (click)="startDeleteProject($event, project)"
+              title="Xóa dự án"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                  clip-rule="evenodd"
+                />
               </svg>
             </button>
-            <div class="project-cover" [style.background]="getProjectGradient(project)">
+            <div
+              class="project-cover"
+              [style.background]="getProjectGradient(project)"
+            >
               <span class="project-initial">{{ project.name[0] }}</span>
             </div>
             <div class="project-info">
               <h3>{{ project.name }}</h3>
-              <p>{{ project.description || 'Không có mô tả' }}</p>
+              <p>{{ project.description || "Không có mô tả" }}</p>
               <div class="project-meta">
                 <span>
-                  <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"
+                    />
                   </svg>
                   {{ project.memberCount }} thành viên
                 </span>
                 <span>
-                  <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                    />
                   </svg>
                   {{ project.boardCount }} bảng
                 </span>
@@ -151,7 +222,13 @@
             ></textarea>
           </div>
           <div class="modal-actions">
-            <button type="button" class="btn-secondary" (click)="showCreateModal.set(false)">Hủy</button>
+            <button
+              type="button"
+              class="btn-secondary"
+              (click)="showCreateModal.set(false)"
+            >
+              Hủy
+            </button>
             <button type="submit" class="btn-primary">Tạo</button>
           </div>
         </form>
@@ -165,7 +242,8 @@
       title="Xóa dự án?"
       message="Bạn có chắc chắn muốn xóa dự án này cùng toàn bộ các bảng và thẻ bên trong không? Hành động này không thể hoàn tác."
       (confirm)="confirmDeleteProject()"
-      (cancel)="cancelDeleteProject()">
+      (cancel)="cancelDeleteProject()"
+    >
     </app-confirm-dialog>
   }
 </div>
