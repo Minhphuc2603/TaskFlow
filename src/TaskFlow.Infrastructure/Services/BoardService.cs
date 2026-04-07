@@ -1,0 +1,214 @@
+using Microsoft.EntityFrameworkCore;
+using TaskFlow.Application.DTOs.Board;
+using TaskFlow.Application.Interfaces;
+using TaskFlow.Domain.Entities;
+using TaskFlow.Infrastructure.Data;
+
+namespace TaskFlow.Infrastructure.Services;
+
+public class BoardService : IBoardService
+{
+    private readonly ApplicationDbContext _context;
+
+    public BoardService(ApplicationDbContext context)
+    {
+        _context = context;
+    }
+
+    public async Task<BoardDto?> GetBoardByIdAsync(Guid boardId)
+    {
+        var board = await _context.Boards
+            .Include(b => b.Columns.OrderBy(c => c.Order))
+                .ThenInclude(c => c.Tasks.OrderBy(t => t.Order))
+                    .ThenInclude(t => t.Labels)
+            .Include(b => b.Columns)
+                .ThenInclude(c => c.Tasks)
+                    .ThenInclude(t => t.Comments)
+            .FirstOrDefaultAsync(b => b.Id == boardId);
+
+        if (board == null) return null;
+
+        return MapToDto(board);
+    }
+
+    public async Task<List<BoardDto>> GetBoardsByProjectIdAsync(Guid projectId)
+    {
+        var boards = await _context.Boards
+            .Where(b => b.ProjectId == projectId)
+            .Include(b => b.Columns.OrderBy(c => c.Order))
+                .ThenInclude(c => c.Tasks.OrderBy(t => t.Order))
+                    .ThenInclude(t => t.Labels)
+            .Include(b => b.Columns)
+                .ThenInclude(c => c.Tasks)
+                    .ThenInclude(t => t.Comments)
+            .ToListAsync();
+
+        return boards.Select(MapToDto).ToList();
+    }
+
+    public async Task<BoardDto> CreateBoardAsync(Guid projectId, string name)
+    {
+        var board = new Board
+        {
+            Name = name,
+            ProjectId = projectId
+        };
+
+        _context.Boards.Add(board);
+
+        // Create default columns
+        var defaultColumns = new[] 
+        { 
+            new { Name = "To Do", Color = "#64748b" }, 
+            new { Name = "In Progress", Color = "#3b82f6" }, 
+            new { Name = "Review", Color = "#fbbf24" }, 
+            new { Name = "Done", Color = "#22c55e" } 
+        };
+        for (int i = 0; i < defaultColumns.Length; i++)
+        {
+            _context.BoardColumns.Add(new BoardColumn
+            {
+                Name = defaultColumns[i].Name,
+                Color = defaultColumns[i].Color,
+                Order = i,
+                BoardId = board.Id
+            });
+        }
+
+        await _context.SaveChangesAsync();
+
+        return (await GetBoardByIdAsync(board.Id))!;
+    }
+
+    public async Task MoveTaskAsync(Guid taskId, Guid targetColumnId, int newOrder)
+    {
+        var task = await _context.TaskItems.FindAsync(taskId);
+        if (task == null) throw new Exception("Task not found.");
+
+        var oldColumnId = task.ColumnId;
+
+        // Reorder tasks in the old column
+        if (oldColumnId != targetColumnId)
+        {
+            var oldColumnTasks = await _context.TaskItems
+                .Where(t => t.ColumnId == oldColumnId && t.Id != taskId)
+                .OrderBy(t => t.Order)
+                .ToListAsync();
+
+            for (int i = 0; i < oldColumnTasks.Count; i++)
+            {
+                oldColumnTasks[i].Order = i;
+            }
+        }
+
+        // Insert task into target column at the new order
+        var targetColumnTasks = await _context.TaskItems
+            .Where(t => t.ColumnId == targetColumnId && t.Id != taskId)
+            .OrderBy(t => t.Order)
+            .ToListAsync();
+
+        task.ColumnId = targetColumnId;
+        task.Order = newOrder;
+
+        // Shift tasks after the insertion point
+        foreach (var t in targetColumnTasks.Where(t => t.Order >= newOrder))
+        {
+            t.Order++;
+        }
+
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<TaskItemDto> AddTaskAsync(Guid columnId, string title, string? description, string userId)
+    {
+        var column = await _context.BoardColumns
+            .Include(c => c.Tasks)
+            .FirstOrDefaultAsync(c => c.Id == columnId);
+
+        if (column == null) throw new Exception("Column not found.");
+
+        var newOrder = column.Tasks.Count != 0 ? column.Tasks.Max(t => t.Order) + 1 : 0;
+
+        var task = new TaskItem
+        {
+            Title = title,
+            Description = description,
+            ColumnId = columnId,
+            Order = newOrder,
+            CreatedBy = userId,
+            Priority = TaskFlow.Domain.Enums.Priority.None
+        };
+
+        _context.TaskItems.Add(task);
+        await _context.SaveChangesAsync();
+
+        return new TaskItemDto
+        {
+            Id = task.Id,
+            Title = task.Title,
+            Description = task.Description,
+            Order = task.Order,
+            Priority = task.Priority,
+            ColumnId = task.ColumnId,
+            CommentCount = 0,
+            Labels = []
+        };
+    }
+
+    public async Task DeleteTaskAsync(Guid taskId)
+    {
+        var task = await _context.TaskItems.FindAsync(taskId);
+        if (task == null) throw new Exception("Task not found.");
+
+        var columnId = task.ColumnId;
+        _context.TaskItems.Remove(task);
+        await _context.SaveChangesAsync();
+
+        // Reorder remaining tasks in the column
+        var remainingTasks = await _context.TaskItems
+            .Where(t => t.ColumnId == columnId)
+            .OrderBy(t => t.Order)
+            .ToListAsync();
+
+        for (int i = 0; i < remainingTasks.Count; i++)
+        {
+            remainingTasks[i].Order = i;
+        }
+        await _context.SaveChangesAsync();
+    }
+
+    private static BoardDto MapToDto(Board board)
+    {
+        return new BoardDto
+        {
+            Id = board.Id,
+            Name = board.Name,
+            ProjectId = board.ProjectId,
+            Columns = [.. board.Columns.Select(c => new BoardColumnDto
+            {
+                Id = c.Id,
+                Name = c.Name,
+                Color = c.Color,
+                Order = c.Order,
+                Tasks = [.. c.Tasks.Select(t => new TaskItemDto
+                {
+                    Id = t.Id,
+                    Title = t.Title,
+                    Description = t.Description,
+                    Order = t.Order,
+                    Priority = t.Priority,
+                    DueDate = t.DueDate,
+                    AssigneeId = t.AssigneeId,
+                    ColumnId = t.ColumnId,
+                    CommentCount = t.Comments.Count,
+                    Labels = [.. t.Labels.Select(l => new TaskLabelDto
+                    {
+                        Id = l.Id,
+                        Name = l.Name,
+                        Color = l.Color
+                    })]
+                })]
+            })]
+        };
+    }
+}

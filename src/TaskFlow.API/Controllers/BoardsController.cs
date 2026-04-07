@@ -1,0 +1,102 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using TaskFlow.Application.DTOs.Board;
+using TaskFlow.Application.Interfaces;
+
+namespace TaskFlow.API.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+[Authorize]
+public class BoardsController : ControllerBase
+{
+    private readonly IBoardService _boardService;
+
+    public BoardsController(IBoardService boardService)
+    {
+        _boardService = boardService;
+    }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<BoardDto>> GetBoard(Guid id)
+    {
+        var board = await _boardService.GetBoardByIdAsync(id);
+        if (board == null) return NotFound();
+        return Ok(board);
+    }
+
+    [HttpGet("project/{projectId}")]
+    public async Task<ActionResult<List<BoardDto>>> GetBoardsByProject(Guid projectId)
+    {
+        var boards = await _boardService.GetBoardsByProjectIdAsync(projectId);
+        return Ok(boards);
+    }
+
+    [HttpPost("project/{projectId}")]
+    public async Task<ActionResult<BoardDto>> CreateBoard(Guid projectId, [FromBody] CreateBoardRequest request)
+    {
+        var board = await _boardService.CreateBoardAsync(projectId, request.Name);
+        return CreatedAtAction(nameof(GetBoard), new { id = board.Id }, board);
+    }
+
+    [HttpPut("tasks/{taskId}/move")]
+    public async Task<IActionResult> MoveTask(Guid taskId, [FromBody] MoveTaskRequest request)
+    {
+        try
+        {
+            await _boardService.MoveTaskAsync(taskId, request.TargetColumnId, request.NewOrder);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+    [HttpPost("columns/{columnId}/tasks")]
+    public async Task<ActionResult<TaskItemDto>> AddTask(Guid columnId, [FromBody] AddTaskRequest request)
+    {
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null) return Unauthorized();
+
+        try
+        {
+            var task = await _boardService.AddTaskAsync(columnId, request.Title, request.Description, userId);
+            return Ok(task);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpDelete("tasks/{taskId}")]
+    public async Task<IActionResult> DeleteTask(Guid taskId)
+    {
+        try
+        {
+            await _boardService.DeleteTaskAsync(taskId);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+}
+
+public class AddTaskRequest
+{
+    public string Title { get; set; } = string.Empty;
+    public string? Description { get; set; }
+}
+
+public class CreateBoardRequest
+{
+    public string Name { get; set; } = string.Empty;
+}
+
+public class MoveTaskRequest
+{
+    public Guid TargetColumnId { get; set; }
+    public int NewOrder { get; set; }
+}
