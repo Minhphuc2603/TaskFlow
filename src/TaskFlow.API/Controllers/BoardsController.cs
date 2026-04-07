@@ -82,6 +82,45 @@ public class BoardsController : ControllerBase
             return BadRequest(new { message = ex.Message });
         }
     }
+
+    [HttpPut("tasks/{taskId}")]
+    public async Task<ActionResult<TaskItemDto>> UpdateTask(Guid taskId, [FromBody] UpdateTaskRequest request)
+    {
+        try
+        {
+            var task = await _boardService.UpdateTaskAsync(taskId, request);
+            return Ok(task);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpGet("tasks/{taskId}/comments")]
+    public async Task<ActionResult<List<TaskCommentDto>>> GetComments(Guid taskId)
+    {
+        var comments = await _boardService.GetCommentsAsync(taskId);
+        return Ok(comments);
+    }
+
+    [HttpPost("tasks/{taskId}/comments")]
+    public async Task<ActionResult<TaskCommentDto>> AddComment(Guid taskId, [FromBody] AddCommentRequest request)
+    {
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        var userName = User.FindFirst("FullName")?.Value ?? User.Identity?.Name ?? "Unknown";
+        if (userId == null) return Unauthorized();
+
+        try
+        {
+            var comment = await _boardService.AddCommentAsync(taskId, request.Content, userId, userName);
+            return Ok(comment);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
 }
 
 public class AddTaskRequest

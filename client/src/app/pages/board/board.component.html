@@ -75,6 +75,7 @@
                   style="display: block"
                   [task]="task"
                   (delete)="deleteTask(task.id, column.id)"
+                  (click)="openTask(task, column.name)"
                 >
                 </app-task-card>
               }
@@ -149,5 +150,16 @@
       (cancel)="cancelDelete()"
     >
     </app-confirm-dialog>
+  }
+
+  <!-- Task Detail Panel -->
+  @if (selectedTask()) {
+    <app-task-detail
+      [task]="selectedTask()!.task"
+      [columnName]="selectedTask()!.columnName"
+      (close)="closeDetail()"
+      (updated)="onTaskUpdated($event)"
+    >
+    </app-task-detail>
   }
 </div>

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Board, TaskItem } from '../models/project.model';
+import { Board, TaskItem, TaskComment, UpdateTaskRequest } from '../models/project.model';
 
 @Injectable({
   providedIn: 'root'
@@ -40,5 +40,17 @@ export class BoardService {
 
   deleteTask(taskId: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/tasks/${taskId}`);
+  }
+
+  updateTask(taskId: string, data: UpdateTaskRequest): Observable<TaskItem> {
+    return this.http.put<TaskItem>(`${this.apiUrl}/tasks/${taskId}`, data);
+  }
+
+  getComments(taskId: string): Observable<TaskComment[]> {
+    return this.http.get<TaskComment[]>(`${this.apiUrl}/tasks/${taskId}/comments`);
+  }
+
+  addComment(taskId: string, content: string): Observable<TaskComment> {
+    return this.http.post<TaskComment>(`${this.apiUrl}/tasks/${taskId}/comments`, { content });
   }
 }

@@ -177,6 +177,85 @@ public class BoardService : IBoardService
         await _context.SaveChangesAsync();
     }
 
+    public async Task<TaskItemDto> UpdateTaskAsync(Guid taskId, UpdateTaskRequest request)
+    {
+        var task = await _context.TaskItems
+            .Include(t => t.Labels)
+            .Include(t => t.Comments)
+            .FirstOrDefaultAsync(t => t.Id == taskId);
+
+        if (task == null) throw new Exception("Task not found.");
+
+        if (request.Title != null) task.Title = request.Title;
+        if (request.Description != null) task.Description = request.Description;
+        if (request.Priority.HasValue) task.Priority = request.Priority.Value;
+        if (request.ClearDueDate) task.DueDate = null;
+        else if (request.DueDate.HasValue) task.DueDate = request.DueDate.Value;
+
+        await _context.SaveChangesAsync();
+
+        return new TaskItemDto
+        {
+            Id = task.Id,
+            Title = task.Title,
+            Description = task.Description,
+            Order = task.Order,
+            Priority = task.Priority,
+            DueDate = task.DueDate,
+            AssigneeId = task.AssigneeId,
+            ColumnId = task.ColumnId,
+            CommentCount = task.Comments.Count,
+            Labels = [.. task.Labels.Select(l => new TaskLabelDto
+            {
+                Id = l.Id,
+                Name = l.Name,
+                Color = l.Color
+            })]
+        };
+    }
+
+    public async Task<List<TaskCommentDto>> GetCommentsAsync(Guid taskId)
+    {
+        var comments = await _context.TaskComments
+            .Where(c => c.TaskItemId == taskId)
+            .OrderByDescending(c => c.CreatedAt)
+            .ToListAsync();
+
+        return [.. comments.Select(c => new TaskCommentDto
+        {
+            Id = c.Id,
+            Content = c.Content,
+            UserId = c.UserId,
+            UserName = c.UserId, // Will be replaced with actual user name lookup
+            CreatedAt = c.CreatedAt
+        })];
+    }
+
+    public async Task<TaskCommentDto> AddCommentAsync(Guid taskId, string content, string userId, string userName)
+    {
+        var task = await _context.TaskItems.FindAsync(taskId);
+        if (task == null) throw new Exception("Task not found.");
+
+        var comment = new TaskComment
+        {
+            Content = content,
+            UserId = userId,
+            TaskItemId = taskId
+        };
+
+        _context.TaskComments.Add(comment);
+        await _context.SaveChangesAsync();
+
+        return new TaskCommentDto
+        {
+            Id = comment.Id,
+            Content = comment.Content,
+            UserId = comment.UserId,
+            UserName = userName,
+            CreatedAt = comment.CreatedAt
+        };
+    }
+
     private static BoardDto MapToDto(Board board)
     {
         return new BoardDto

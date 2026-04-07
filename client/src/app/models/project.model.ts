@@ -55,3 +55,19 @@ export enum Priority {
   High = 3,
   Critical = 4
 }
+
+export interface TaskComment {
+  id: string;
+  content: string;
+  userId: string;
+  userName: string;
+  createdAt: string;
+}
+
+export interface UpdateTaskRequest {
+  title?: string;
+  description?: string;
+  priority?: Priority;
+  dueDate?: string | null;
+  clearDueDate?: boolean;
+}

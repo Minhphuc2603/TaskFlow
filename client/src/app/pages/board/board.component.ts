@@ -7,12 +7,13 @@ import { BoardService } from '../../services/board.service';
 import { Board, TaskItem, Priority, BoardColumn } from '../../models/project.model';
 import { TaskCardComponent } from './components/task-card/task-card.component';
 import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
+import { TaskDetailComponent } from './components/task-detail/task-detail.component';
 import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-board',
   standalone: true,
-  imports: [CommonModule, DragDropModule, RouterLink, FormsModule, TaskCardComponent, ConfirmDialogComponent],
+  imports: [CommonModule, DragDropModule, RouterLink, FormsModule, TaskCardComponent, ConfirmDialogComponent, TaskDetailComponent],
   templateUrl: './board.component.html',
   styleUrl: './board.component.scss'
 })
@@ -21,6 +22,7 @@ export class BoardComponent implements OnInit {
   isLoading = signal(true);
   addingToColumn = signal<string | null>(null);
   taskToDelete = signal<{taskId: string, columnId: string} | null>(null);
+  selectedTask = signal<{task: TaskItem, columnName: string} | null>(null);
   newTaskTitle = '';
 
   @ViewChildren('taskInput') taskInputs!: QueryList<ElementRef>;
@@ -155,5 +157,24 @@ export class BoardComponent implements OnInit {
       }
     });
   }
-}
 
+  openTask(task: TaskItem, columnName: string) {
+    this.selectedTask.set({ task, columnName });
+  }
+
+  closeDetail() {
+    this.selectedTask.set(null);
+  }
+
+  onTaskUpdated(updatedTask: TaskItem) {
+    const board = this.board();
+    if (!board) return;
+    for (const col of board.columns) {
+      const idx = col.tasks.findIndex(t => t.id === updatedTask.id);
+      if (idx !== -1) {
+        col.tasks[idx] = { ...col.tasks[idx], ...updatedTask };
+        break;
+      }
+    }
+  }
+}
