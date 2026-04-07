@@ -4,24 +4,38 @@
     <div class="left">
       <a routerLink="/dashboard" class="btn-back">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/>
+          <path
+            fill-rule="evenodd"
+            d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+            clip-rule="evenodd"
+          />
         </svg>
         Bảng điều khiển
       </a>
       <h1 class="board-title">
-        {{ isLoading() ? 'Đang tải...' : board()?.name }}
+        {{ isLoading() ? "Đang tải..." : board()?.name }}
         <span class="badge">Dự án</span>
       </h1>
     </div>
     <div class="right">
-      <button class="btn-theme-toggle" (click)="themeService.toggleTheme()" title="Đổi giao diện">
+      <button
+        class="btn-theme-toggle"
+        (click)="themeService.toggleTheme()"
+        title="Đổi giao diện"
+      >
         @if (themeService.isDarkMode()) {
           <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/>
+            <path
+              fill-rule="evenodd"
+              d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+              clip-rule="evenodd"
+            />
           </svg>
         } @else {
           <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+            <path
+              d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"
+            />
           </svg>
         }
       </button>
@@ -30,9 +44,7 @@
         <div class="avatar">B</div>
         <div class="avatar plus">+</div>
       </div>
-      <button class="btn-primary">
-         Khởi tạo Task
-      </button>
+      <button class="btn-primary">Khởi tạo Task</button>
     </div>
   </header>
 
@@ -42,7 +54,6 @@
       <div class="loading-spinner"></div>
     } @else if (board()) {
       <div class="columns-wrapper" cdkDropListGroup>
-        
         @for (column of board()!.columns; track column.id) {
           <div class="column" [style.--col-color]="column.color || '#475569'">
             <div class="column-header">
@@ -50,23 +61,24 @@
               <span class="task-count">{{ column.tasks.length }}</span>
             </div>
 
-            <div 
+            <div
               class="task-list"
               id="{{ column.id }}"
               cdkDropList
               [cdkDropListData]="column.tasks"
-              (cdkDropListDropped)="drop($event, column.id)">
-
+              (cdkDropListDropped)="drop($event, column.id)"
+            >
               @for (task of column.tasks; track task.id) {
                 <app-task-card
                   cdkDrag
                   class="task-card"
-                  style="display: block;"
+                  style="display: block"
                   [task]="task"
-                  (delete)="deleteTask(task.id, column.id)">
+                  (delete)="deleteTask(task.id, column.id)"
+                >
                 </app-task-card>
               }
-              
+
               <!-- Empty placeholder for drag -->
               @if (column.tasks.length === 0) {
                 <div class="empty-list-placeholder">Thả task vào đây</div>
@@ -79,16 +91,32 @@
                   class="add-task-input"
                   [(ngModel)]="newTaskTitle"
                   placeholder="Nhập tiêu đề thẻ..."
-                  (keydown.enter)="submitCreateTask(column.id); $event.preventDefault()"
+                  (keydown.enter)="
+                    submitCreateTask(column.id); $event.preventDefault()
+                  "
                   (keydown.escape)="cancelAddTask()"
                   rows="2"
                   #taskInput
                 ></textarea>
                 <div class="add-task-actions">
-                  <button class="btn-primary btn-sm" (click)="submitCreateTask(column.id)">Thêm thẻ</button>
+                  <button
+                    class="btn-primary btn-sm"
+                    (click)="submitCreateTask(column.id)"
+                  >
+                    Thêm thẻ
+                  </button>
                   <button class="btn-cancel-task" (click)="cancelAddTask()">
-                    <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                        clip-rule="evenodd"
+                      />
                     </svg>
                   </button>
                 </div>
@@ -104,7 +132,6 @@
         <div class="column add-column">
           <button class="btn-add-column">+ Thêm cột</button>
         </div>
-        
       </div>
     } @else {
       <div class="error-state">
@@ -119,7 +146,8 @@
       title="Xóa thẻ?"
       message="Bạn có chắc chắn muốn xóa thẻ này không? Hành động này không thể hoàn tác."
       (confirm)="confirmDelete()"
-      (cancel)="cancelDelete()">
+      (cancel)="cancelDelete()"
+    >
     </app-confirm-dialog>
   }
 </div>
