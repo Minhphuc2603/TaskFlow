@@ -329,7 +329,7 @@ public class BoardService : IBoardService
             Name = column.Name,
             Color = column.Color,
             Order = column.Order,
-            Tasks = new List<TaskItemDto>()
+            Tasks = []
         };
     }
 }
