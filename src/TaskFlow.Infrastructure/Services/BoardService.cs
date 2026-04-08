@@ -305,4 +305,31 @@ public class BoardService : IBoardService
         await _context.SaveChangesAsync();
     }
 
+    public async Task<BoardColumnDto> AddColumnAsync(Guid boardId, string name, string color)
+    {
+        var board = await _context.Boards.Include(b => b.Columns).FirstOrDefaultAsync(b => b.Id == boardId);
+        if (board == null) throw new Exception("Board not found.");
+
+        var newOrder = board.Columns.Count != 0 ? board.Columns.Max(c => c.Order) + 1 : 0;
+
+        var column = new BoardColumn
+        {
+            Name = name,
+            Color = color,
+            Order = newOrder,
+            BoardId = boardId
+        };
+
+        _context.BoardColumns.Add(column);
+        await _context.SaveChangesAsync();
+
+        return new BoardColumnDto
+        {
+            Id = column.Id,
+            Name = column.Name,
+            Color = column.Color,
+            Order = column.Order,
+            Tasks = new List<TaskItemDto>()
+        };
+    }
 }

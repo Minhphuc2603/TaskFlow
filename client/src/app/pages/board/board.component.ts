@@ -25,6 +25,10 @@ export class BoardComponent implements OnInit {
   columnToDelete = signal<{id: string, name: string} | null>(null);
   selectedTask = signal<{task: TaskItem, columnName: string} | null>(null);
   newTaskTitle = '';
+  
+  isAddingColumn = signal(false);
+  newColumnName = '';
+  newColumnColor = '#475569';
 
   @ViewChildren('taskInput') taskInputs!: QueryList<ElementRef>;
 
@@ -126,6 +130,34 @@ export class BoardComponent implements OnInit {
         }, 50);
       },
       error: (err) => console.error('Create task failed', err)
+    });
+  }
+
+  startAddColumn() {
+    this.isAddingColumn.set(true);
+    this.newColumnName = '';
+    this.newColumnColor = '#475569';
+  }
+
+  cancelAddColumn() {
+    this.isAddingColumn.set(false);
+    this.newColumnName = '';
+  }
+
+  submitCreateColumn() {
+    const name = this.newColumnName.trim();
+    if (!name) return;
+
+    const board = this.board();
+    if (!board) return;
+
+    this.boardService.addColumn(board.id, name, this.newColumnColor).subscribe({
+      next: (newCol) => {
+        board.columns.push(newCol);
+        this.isAddingColumn.set(false);
+        this.newColumnName = '';
+      },
+      error: (err) => console.error('Create column failed', err)
     });
   }
 

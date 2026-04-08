@@ -135,6 +135,25 @@ public class BoardsController : ControllerBase
             return BadRequest(new { message = ex.Message });
         }
     }
+    [HttpPost("{boardId}/columns")]
+    public async Task<ActionResult<BoardColumnDto>> AddColumn(Guid boardId, [FromBody] AddColumnRequest request)
+    {
+        try
+        {
+            var column = await _boardService.AddColumnAsync(boardId, request.Name, request.Color);
+            return Ok(column);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+}
+
+public class AddColumnRequest
+{
+    public string Name { get; set; } = string.Empty;
+    public string Color { get; set; } = string.Empty;
 }
 
 public class AddTaskRequest
