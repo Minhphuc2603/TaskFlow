@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { BoardService } from '../../services/board.service';
-import { Board, TaskItem, Priority, BoardColumn } from '../../models/project.model';
+import { Board, TaskItem } from '../../models/project.model';
 import { TaskCardComponent } from './components/task-card/task-card.component';
 import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
 import { TaskDetailComponent } from './components/task-detail/task-detail.component';
@@ -21,11 +21,11 @@ export class BoardComponent implements OnInit {
   board = signal<Board | null>(null);
   isLoading = signal(true);
   addingToColumn = signal<string | null>(null);
-  taskToDelete = signal<{taskId: string, columnId: string} | null>(null);
-  columnToDelete = signal<{id: string, name: string} | null>(null);
-  selectedTask = signal<{task: TaskItem, columnName: string} | null>(null);
+  taskToDelete = signal<{ taskId: string, columnId: string } | null>(null);
+  columnToDelete = signal<{ id: string, name: string } | null>(null);
+  selectedTask = signal<{ task: TaskItem, columnName: string } | null>(null);
   newTaskTitle = '';
-  
+
   isAddingColumn = signal(false);
   newColumnName = '';
   newColumnColor = '#475569';
@@ -36,7 +36,7 @@ export class BoardComponent implements OnInit {
     private route: ActivatedRoute,
     private boardService: BoardService,
     public themeService: ThemeService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const projectId = this.route.snapshot.paramMap.get('id');
@@ -48,7 +48,7 @@ export class BoardComponent implements OnInit {
             boards[0].columns.sort((a, b) => a.order - b.order);
             // Sort tasks inside each column
             boards[0].columns.forEach(c => c.tasks.sort((t1, t2) => t1.order - t2.order));
-            
+
             this.board.set(boards[0]);
           }
           this.isLoading.set(false);
