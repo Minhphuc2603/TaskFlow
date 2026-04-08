@@ -13,4 +13,6 @@ public interface IBoardService
     Task<TaskItemDto> UpdateTaskAsync(Guid taskId, UpdateTaskRequest request);
     Task<List<TaskCommentDto>> GetCommentsAsync(Guid taskId);
     Task<TaskCommentDto> AddCommentAsync(Guid taskId, string content, string userId, string userName);
+    Task DeleteColumnAsync(Guid columnId);
+
 }
