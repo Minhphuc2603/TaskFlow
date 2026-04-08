@@ -121,6 +121,20 @@ public class BoardsController : ControllerBase
             return BadRequest(new { message = ex.Message });
         }
     }
+
+    [HttpDelete("columns/{columnId}")]
+    public async Task<IActionResult> DeleteColumn(Guid columnId)
+    {
+        try
+        {
+            await _boardService.DeleteColumnAsync(columnId);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
 }
 
 public class AddTaskRequest

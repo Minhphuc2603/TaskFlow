@@ -188,6 +188,14 @@
       border-radius: 10px;
       font-weight: 600;
     }
+
+    .btn-delete-column {
+      transition: color 0.2s;
+      
+      &:hover {
+        color: var(--danger, #ef4444) !important;
+      }
+    }
   }
 
   .task-list {

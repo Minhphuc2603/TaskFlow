@@ -22,6 +22,7 @@ export class BoardComponent implements OnInit {
   isLoading = signal(true);
   addingToColumn = signal<string | null>(null);
   taskToDelete = signal<{taskId: string, columnId: string} | null>(null);
+  columnToDelete = signal<{id: string, name: string} | null>(null);
   selectedTask = signal<{task: TaskItem, columnName: string} | null>(null);
   newTaskTitle = '';
 
@@ -154,6 +155,33 @@ export class BoardComponent implements OnInit {
       error: (err) => {
         console.error('Delete task failed', err);
         this.taskToDelete.set(null);
+      }
+    });
+  }
+
+  deleteColumn(columnId: string, columnName: string) {
+    this.columnToDelete.set({ id: columnId, name: columnName });
+  }
+
+  cancelDeleteColumn() {
+    this.columnToDelete.set(null);
+  }
+
+  confirmDeleteColumn() {
+    const toDelete = this.columnToDelete();
+    if (!toDelete) return;
+
+    this.boardService.deleteColumn(toDelete.id).subscribe({
+      next: () => {
+        const board = this.board();
+        if (board) {
+          board.columns = board.columns.filter(c => c.id !== toDelete.id);
+        }
+        this.columnToDelete.set(null);
+      },
+      error: (err) => {
+        console.error('Delete column failed', err);
+        this.columnToDelete.set(null);
       }
     });
   }

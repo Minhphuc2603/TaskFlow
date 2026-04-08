@@ -293,14 +293,10 @@ public class BoardService : IBoardService
 
     public async Task DeleteColumnAsync(Guid columnId)
     {
+
         var column = await _context.BoardColumns
             .Include(c => c.Tasks)
-            .FirstOrDefaultAsync(c => c.Id == columnId);
-
-        if (column == null)
-        {
-            throw new Exception("Column not found");
-        }
+            .FirstOrDefaultAsync(c => c.Id == columnId) ?? throw new Exception("Column not found");
 
         // Có thể kiểm tra thêm nếu cột còn Task thì không cho xóa, 
         // hoặc xóa luôn cả Task (tùy thuộc vào yêu cầu của bạn vì DeleteBehavior.Cascade đã được set sẵn)

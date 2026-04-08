@@ -53,4 +53,9 @@ export class BoardService {
   addComment(taskId: string, content: string): Observable<TaskComment> {
     return this.http.post<TaskComment>(`${this.apiUrl}/tasks/${taskId}/comments`, { content });
   }
+
+  deleteColumn(columnId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/columns/${columnId}`);
+  }
 }
+
