@@ -169,7 +169,7 @@
 
 // Date Input
 .date-input {
-  background: var(--bg-color);
+  background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: 8px;
   padding: 0.55rem 0.75rem;
@@ -177,11 +177,40 @@
   font-size: 0.85rem;
   font-family: inherit;
   outline: none;
-  transition: border-color 0.2s;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  color-scheme: dark;
+
+  :host-context(body.light-theme) & {
+    color-scheme: light;
+  }
+
+  // Enhance native calendar picker
+  &::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+    transition: 0.2s ease;
+    padding: 0.2rem;
+    
+    &:hover {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+  }
+
+  // Explicitly check for light-theme class context if app handles custom theme toggle
+  :host-context(body:not(.light-theme)) &::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
+  :host-context(body.light-theme) &::-webkit-calendar-picker-indicator {
+    filter: invert(0);
+  }
 
   &:focus {
     border-color: #6366f1;
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    background: rgba(99, 102, 241, 0.05);
   }
 }
 

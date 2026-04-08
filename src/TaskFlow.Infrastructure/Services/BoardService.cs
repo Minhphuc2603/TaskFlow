@@ -18,6 +18,7 @@ public class BoardService : IBoardService
     public async Task<BoardDto?> GetBoardByIdAsync(Guid boardId)
     {
         var board = await _context.Boards
+            .Include(b => b.Project)
             .Include(b => b.Columns.OrderBy(c => c.Order))
                 .ThenInclude(c => c.Tasks.OrderBy(t => t.Order))
                     .ThenInclude(t => t.Labels)
@@ -34,6 +35,7 @@ public class BoardService : IBoardService
     public async Task<List<BoardDto>> GetBoardsByProjectIdAsync(Guid projectId)
     {
         var boards = await _context.Boards
+            .Include(b => b.Project)
             .Where(b => b.ProjectId == projectId)
             .Include(b => b.Columns.OrderBy(c => c.Order))
                 .ThenInclude(c => c.Tasks.OrderBy(t => t.Order))
@@ -218,17 +220,21 @@ public class BoardService : IBoardService
     {
         var comments = await _context.TaskComments
             .Where(c => c.TaskItemId == taskId)
+            .Join(_context.Users, 
+                  c => c.UserId, 
+                  u => u.Id, 
+                  (c, u) => new TaskCommentDto
+                  {
+                      Id = c.Id,
+                      Content = c.Content,
+                      UserId = c.UserId,
+                      UserName = u.FullName ?? "Unknown",
+                      CreatedAt = c.CreatedAt
+                  })
             .OrderByDescending(c => c.CreatedAt)
             .ToListAsync();
 
-        return [.. comments.Select(c => new TaskCommentDto
-        {
-            Id = c.Id,
-            Content = c.Content,
-            UserId = c.UserId,
-            UserName = c.UserId, // Will be replaced with actual user name lookup
-            CreatedAt = c.CreatedAt
-        })];
+        return comments;
     }
 
     public async Task<TaskCommentDto> AddCommentAsync(Guid taskId, string content, string userId, string userName)
@@ -263,6 +269,7 @@ public class BoardService : IBoardService
             Id = board.Id,
             Name = board.Name,
             ProjectId = board.ProjectId,
+            ProjectName = board.Project?.Name ?? string.Empty,
             Columns = [.. board.Columns.Select(c => new BoardColumnDto
             {
                 Id = c.Id,

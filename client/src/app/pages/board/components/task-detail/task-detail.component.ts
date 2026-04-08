@@ -90,7 +90,9 @@ export class TaskDetailComponent implements OnInit, OnChanges {
 
   saveDueDate() {
     if (this.editDueDate) {
-      this.saveField({ dueDate: this.editDueDate });
+      // Convert to ISO string to ensure the .NET backend correctly parses the date
+      const isoDate = new Date(this.editDueDate).toISOString();
+      this.saveField({ dueDate: isoDate });
     } else {
       this.saveField({ clearDueDate: true });
     }
