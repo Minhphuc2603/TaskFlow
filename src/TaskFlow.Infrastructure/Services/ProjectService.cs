@@ -32,7 +32,8 @@ public class ProjectService : IProjectService
                 CoverImageUrl = pm.Project.CoverImageUrl,
                 CreatedAt = pm.Project.CreatedAt,
                 MemberCount = pm.Project.Members.Count,
-                BoardCount = pm.Project.Boards.Count
+                BoardCount = pm.Project.Boards.Count,
+                UserRole = pm.Role.ToString()
             })
             .ToListAsync();
 
@@ -237,5 +238,12 @@ public class ProjectService : IProjectService
             .ToListAsync();
 
         return users;
+    }
+
+    public async Task<string?> GetUserRoleAsync(Guid projectId, string userId)
+    {
+        var member = await _context.ProjectMembers
+            .FirstOrDefaultAsync(pm => pm.ProjectId == projectId && pm.UserId == userId);
+        return member?.Role.ToString();
     }
 }

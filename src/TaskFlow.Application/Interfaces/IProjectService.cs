@@ -13,5 +13,6 @@ public interface IProjectService
     Task<ProjectMemberDto> AddMemberAsync(Guid projectId, string email);
     Task RemoveMemberAsync(Guid projectId, Guid memberId);
     Task<List<UserSearchDto>> SearchUsersAsync(string query, Guid projectId);
+    Task<string?> GetUserRoleAsync(Guid projectId, string userId);
 }
 

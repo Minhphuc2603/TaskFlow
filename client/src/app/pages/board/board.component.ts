@@ -5,6 +5,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { BoardService } from '../../services/board.service';
 import { ProjectService } from '../../services/project.service';
+import { AuthService } from '../../services/auth.service';
 import { Board, TaskItem, ProjectMember } from '../../models/project.model';
 import { TaskCardComponent } from './components/task-card/task-card.component';
 import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
@@ -28,6 +29,7 @@ export class BoardComponent implements OnInit {
   selectedTask = signal<{ task: TaskItem, columnName: string } | null>(null);
   members = signal<ProjectMember[]>([]);
   showMemberDialog = signal(false);
+  isOwner = signal(false);
   newTaskTitle = '';
 
   isAddingColumn = signal(false);
@@ -40,6 +42,7 @@ export class BoardComponent implements OnInit {
     private route: ActivatedRoute,
     private boardService: BoardService,
     private projectService: ProjectService,
+    private authService: AuthService,
     public themeService: ThemeService
   ) { }
 
@@ -62,7 +65,13 @@ export class BoardComponent implements OnInit {
 
       // Load project members
       this.projectService.getMembers(projectId).subscribe({
-        next: (members) => this.members.set(members)
+        next: (members) => {
+          this.members.set(members);
+          // Check if current user is Owner
+          const currentUserId = this.authService.currentUser()?.userId;
+          const me = members.find(m => m.userId === currentUserId);
+          this.isOwner.set(me?.role === 'Owner');
+        }
       });
     }
   }

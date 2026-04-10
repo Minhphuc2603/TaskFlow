@@ -6,6 +6,7 @@ export interface Project {
   createdAt: string;
   memberCount: number;
   boardCount: number;
+  userRole?: string;
 }
 
 export interface CreateProject {

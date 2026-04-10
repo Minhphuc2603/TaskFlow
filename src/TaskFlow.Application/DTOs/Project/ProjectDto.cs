@@ -9,4 +9,5 @@ public class ProjectDto
     public DateTime CreatedAt { get; set; }
     public int MemberCount { get; set; }
     public int BoardCount { get; set; }
+    public string? UserRole { get; set; }
 }

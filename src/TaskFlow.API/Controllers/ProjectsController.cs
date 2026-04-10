@@ -62,6 +62,11 @@ public class ProjectsController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteProject(Guid id)
     {
+        var userId = GetUserId();
+        var role = await _projectService.GetUserRoleAsync(id, userId);
+        if (role != "Owner")
+            return StatusCode(403, new { message = "Chỉ chủ sở hữu mới có thể xóa dự án." });
+
         try
         {
             await _projectService.DeleteProjectAsync(id);
@@ -83,6 +88,11 @@ public class ProjectsController : ControllerBase
     [HttpPost("{id}/members")]
     public async Task<ActionResult<ProjectMemberDto>> AddMember(Guid id, [FromBody] AddMemberRequest request)
     {
+        var userId = GetUserId();
+        var role = await _projectService.GetUserRoleAsync(id, userId);
+        if (role != "Owner")
+            return StatusCode(403, new { message = "Chỉ chủ sở hữu mới có thể mời thành viên." });
+
         try
         {
             var member = await _projectService.AddMemberAsync(id, request.Email);
@@ -97,6 +107,11 @@ public class ProjectsController : ControllerBase
     [HttpDelete("{id}/members/{memberId}")]
     public async Task<IActionResult> RemoveMember(Guid id, Guid memberId)
     {
+        var userId = GetUserId();
+        var role = await _projectService.GetUserRoleAsync(id, userId);
+        if (role != "Owner")
+            return StatusCode(403, new { message = "Chỉ chủ sở hữu mới có thể xóa thành viên." });
+
         try
         {
             await _projectService.RemoveMemberAsync(id, memberId);

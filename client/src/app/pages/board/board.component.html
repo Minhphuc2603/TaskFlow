@@ -69,6 +69,7 @@
                 style="display: flex; align-items: center; gap: 0.5rem"
               >
                 <span class="task-count">{{ column.tasks.length }}</span>
+                @if (isOwner()) {
                 <button
                   class="btn-delete-column"
                   (click)="deleteColumn(column.id, column.name)"
@@ -98,6 +99,7 @@
                     />
                   </svg>
                 </button>
+                }
               </div>
             </div>
 
@@ -170,6 +172,7 @@
           </div>
         }
 
+        @if (isOwner()) {
         <div class="column add-column">
           @if (isAddingColumn()) {
             <div class="add-column-form">
@@ -219,6 +222,7 @@
             </button>
           }
         </div>
+        }
       </div>
     } @else {
       <div class="error-state">
@@ -268,6 +272,7 @@
   @if (showMemberDialog() && board()) {
     <app-member-dialog
       [projectId]="board()!.projectId"
+      [isOwner]="isOwner()"
       (close)="showMemberDialog.set(false)"
     />
   }

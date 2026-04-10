@@ -121,6 +121,7 @@
       } @else {
         @for (project of projects(); track project.id) {
           <div class="project-card" (click)="openProject(project)">
+            @if (project.userRole === 'Owner') {
             <button
               class="btn-delete-project"
               (click)="startDeleteProject($event, project)"
@@ -139,6 +140,7 @@
                 />
               </svg>
             </button>
+            }
             <button
               class="btn-members-project"
               (click)="openMembers($event, project)"
@@ -253,6 +255,7 @@
   @if (memberProject()) {
     <app-member-dialog
       [projectId]="memberProject()!.id"
+      [isOwner]="memberProject()!.userRole === 'Owner'"
       (close)="memberProject.set(null)"
     />
   }

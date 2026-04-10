@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Application.DTOs.Board;
@@ -11,11 +12,16 @@ namespace TaskFlow.API.Controllers;
 public class BoardsController : ControllerBase
 {
     private readonly IBoardService _boardService;
+    private readonly IProjectService _projectService;
 
-    public BoardsController(IBoardService boardService)
+    public BoardsController(IBoardService boardService, IProjectService projectService)
     {
         _boardService = boardService;
+        _projectService = projectService;
     }
+
+    private string GetUserId() =>
+        User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? throw new UnauthorizedAccessException();
 
     [HttpGet("{id}")]
     public async Task<ActionResult<BoardDto>> GetBoard(Guid id)
@@ -125,6 +131,15 @@ public class BoardsController : ControllerBase
     [HttpDelete("columns/{columnId}")]
     public async Task<IActionResult> DeleteColumn(Guid columnId)
     {
+        // Check ownership via column -> board -> project
+        var board = await _boardService.GetBoardByColumnIdAsync(columnId);
+        if (board != null)
+        {
+            var role = await _projectService.GetUserRoleAsync(board.ProjectId, GetUserId());
+            if (role != "Owner")
+                return StatusCode(403, new { message = "Chỉ chủ sở hữu mới có thể xóa cột." });
+        }
+
         try
         {
             await _boardService.DeleteColumnAsync(columnId);
@@ -138,6 +153,15 @@ public class BoardsController : ControllerBase
     [HttpPost("{boardId}/columns")]
     public async Task<ActionResult<BoardColumnDto>> AddColumn(Guid boardId, [FromBody] AddColumnRequest request)
     {
+        // Check ownership via board -> project
+        var board = await _boardService.GetBoardByIdAsync(boardId);
+        if (board != null)
+        {
+            var role = await _projectService.GetUserRoleAsync(board.ProjectId, GetUserId());
+            if (role != "Owner")
+                return StatusCode(403, new { message = "Chỉ chủ sở hữu mới có thể thêm cột." });
+        }
+
         try
         {
             var column = await _boardService.AddColumnAsync(boardId, request.Name, request.Color);

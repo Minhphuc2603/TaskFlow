@@ -15,6 +15,7 @@ import { AuthService } from '../../../../services/auth.service';
 })
 export class MemberDialogComponent implements OnInit, OnDestroy {
   @Input({ required: true }) projectId!: string;
+  @Input() isOwner: boolean = false;
   @Output() close = new EventEmitter<void>();
 
   members = signal<ProjectMember[]>([]);

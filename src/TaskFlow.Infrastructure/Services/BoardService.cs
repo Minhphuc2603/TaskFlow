@@ -291,6 +291,22 @@ public class BoardService : IBoardService
         };
     }
 
+    public async Task<BoardDto?> GetBoardByColumnIdAsync(Guid columnId)
+    {
+        var column = await _context.BoardColumns
+            .Include(c => c.Board)
+            .FirstOrDefaultAsync(c => c.Id == columnId);
+        if (column?.Board == null) return null;
+
+        return new BoardDto
+        {
+            Id = column.Board.Id,
+            ProjectId = column.Board.ProjectId,
+            Name = column.Board.Name,
+            Columns = []
+        };
+    }
+
     private async Task<Dictionary<string, string>> BuildAssigneeMapAsync(Board board)
     {
         var assigneeIds = board.Columns
