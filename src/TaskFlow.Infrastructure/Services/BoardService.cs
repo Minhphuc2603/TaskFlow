@@ -6,14 +6,9 @@ using TaskFlow.Infrastructure.Data;
 
 namespace TaskFlow.Infrastructure.Services;
 
-public class BoardService : IBoardService
+public class BoardService(ApplicationDbContext context) : IBoardService
 {
-    private readonly ApplicationDbContext _context;
-
-    public BoardService(ApplicationDbContext context)
-    {
-        _context = context;
-    }
+    private readonly ApplicationDbContext _context = context;
 
     public async Task<BoardDto?> GetBoardByIdAsync(Guid boardId)
     {
@@ -61,7 +56,7 @@ public class BoardService : IBoardService
                 .ToDictionaryAsync(u => u.Id, u => u.FullName)
             : new Dictionary<string, string>();
 
-        return boards.Select(b => MapToDto(b, assigneeMap)).ToList();
+        return [.. boards.Select(b => MapToDto(b, assigneeMap))];
     }
 
     public async Task<BoardDto> CreateBoardAsync(Guid projectId, string name)
@@ -316,7 +311,7 @@ public class BoardService : IBoardService
             .Distinct()
             .ToList();
 
-        if (assigneeIds.Count == 0) return new Dictionary<string, string>();
+        if (assigneeIds.Count == 0) return [];
 
         return await _context.Users
             .Where(u => assigneeIds.Contains(u.Id))
