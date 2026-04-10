@@ -40,9 +40,15 @@
         }
       </button>
       <div class="avatar-group">
-        <div class="avatar">A</div>
-        <div class="avatar">B</div>
-        <div class="avatar plus">+</div>
+        @for (member of members().slice(0, 3); track member.id) {
+          <div class="avatar" [title]="member.fullName">
+            {{ member.fullName.substring(0, 1).toUpperCase() }}
+          </div>
+        }
+        @if (members().length > 3) {
+          <div class="avatar plus">+{{ members().length - 3 }}</div>
+        }
+        <button class="avatar add" (click)="showMemberDialog.set(true)" title="Quản lý thành viên">+</button>
       </div>
       <button class="btn-primary">Khởi tạo Task</button>
     </div>
@@ -252,9 +258,17 @@
     <app-task-detail
       [task]="selectedTask()!.task"
       [columnName]="selectedTask()!.columnName"
+      [members]="members()"
       (close)="closeDetail()"
       (updated)="onTaskUpdated($event)"
     >
     </app-task-detail>
+  }
+
+  @if (showMemberDialog() && board()) {
+    <app-member-dialog
+      [projectId]="board()!.projectId"
+      (close)="showMemberDialog.set(false)"
+    />
   }
 </div>

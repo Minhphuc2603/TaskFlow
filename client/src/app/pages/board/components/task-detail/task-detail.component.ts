@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TaskItem, TaskComment, Priority, UpdateTaskRequest } from '../../../../models/project.model';
+import { TaskItem, TaskComment, Priority, UpdateTaskRequest, ProjectMember } from '../../../../models/project.model';
 import { BoardService } from '../../../../services/board.service';
 
 @Component({
@@ -14,6 +14,7 @@ import { BoardService } from '../../../../services/board.service';
 export class TaskDetailComponent implements OnInit, OnChanges {
   @Input() task!: TaskItem;
   @Input() columnName: string = '';
+  @Input() members: ProjectMember[] = [];
   @Output() close = new EventEmitter<void>();
   @Output() updated = new EventEmitter<TaskItem>();
 
@@ -25,6 +26,7 @@ export class TaskDetailComponent implements OnInit, OnChanges {
   editDescription = '';
   editPriority: Priority = Priority.None;
   editDueDate = '';
+  showAssigneeDropdown = false;
 
   Priority = Priority;
 
@@ -141,5 +143,26 @@ export class TaskDetailComponent implements OnInit, OnChanges {
     if ((event.target as HTMLElement).classList.contains('detail-overlay')) {
       this.close.emit();
     }
+  }
+
+  saveAssignee(userId: string | null) {
+    this.showAssigneeDropdown = false;
+    if (userId) {
+      const member = this.members.find(m => m.userId === userId);
+      this.saveField({ assigneeId: userId });
+      // Optimistic update
+      this.task.assigneeId = userId;
+      this.task.assigneeName = member?.fullName || undefined;
+    } else {
+      this.saveField({ clearAssignee: true });
+      this.task.assigneeId = undefined;
+      this.task.assigneeName = undefined;
+    }
+  }
+
+  getAssigneeName(): string {
+    if (!this.task.assigneeId) return '';
+    const member = this.members.find(m => m.userId === this.task.assigneeId);
+    return member?.fullName || this.task.assigneeName || 'Unknown';
   }
 }

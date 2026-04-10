@@ -232,12 +232,38 @@
     }
   }
 
+  .btn-members-project {
+    position: absolute;
+    top: 10px;
+    right: 46px;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.5);
+    color: rgba(255, 255, 255, 0.6);
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s;
+    backdrop-filter: blur(4px);
+
+    &:hover {
+      background: rgba(99, 102, 241, 0.9);
+      color: white;
+    }
+  }
+
   &:hover {
     transform: translateY(-4px);
     border-color: rgba(99, 102, 241, 0.3);
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
 
-    .btn-delete-project {
+    .btn-delete-project,
+    .btn-members-project {
       opacity: 1;
       visibility: visible;
     }

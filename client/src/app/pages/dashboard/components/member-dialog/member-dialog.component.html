@@ -1,0 +1,107 @@
+<div class="member-overlay" (click)="onOverlayClick($event)">
+  <div class="member-dialog">
+    <!-- Header -->
+    <div class="dialog-header">
+      <h2>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+        </svg>
+        Thành viên dự án
+      </h2>
+      <button class="btn-close" (click)="close.emit()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Toast Messages -->
+    @if (successMessage()) {
+      <div class="toast success">✓ {{ successMessage() }}</div>
+    }
+    @if (errorMessage()) {
+      <div class="toast error">✕ {{ errorMessage() }}</div>
+    }
+
+    <!-- Search -->
+    <div class="search-section">
+      <div class="search-input-wrapper">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+        </svg>
+        <input
+          type="text"
+          class="search-input"
+          [(ngModel)]="searchQuery"
+          (input)="onSearchInput()"
+          placeholder="Tìm bằng email hoặc tên..."
+          autocomplete="off"
+        />
+      </div>
+
+      <!-- Search Results -->
+      @if (isSearching()) {
+        <div class="search-loading">Đang tìm...</div>
+      }
+      @if (searchResults().length > 0) {
+        <div class="search-results">
+          @for (user of searchResults(); track user.userId) {
+            <div class="search-result-item">
+              <div class="user-avatar">{{ user.fullName.substring(0, 1).toUpperCase() }}</div>
+              <div class="user-info">
+                <span class="user-name">{{ user.fullName }}</span>
+                <span class="user-email">{{ user.email }}</span>
+              </div>
+              <button class="btn-invite" (click)="addMember(user.email)">
+                <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"/>
+                </svg>
+                Mời
+              </button>
+            </div>
+          }
+        </div>
+      }
+      @if (searchQuery.length >= 2 && !isSearching() && searchResults().length === 0) {
+        <div class="search-empty">Không tìm thấy người dùng phù hợp</div>
+      }
+    </div>
+
+    <!-- Member List -->
+    <div class="members-section">
+      <h3>Thành viên hiện tại ({{ members().length }})</h3>
+      @if (isLoading()) {
+        <div class="members-loading">Đang tải...</div>
+      } @else {
+        <div class="members-list">
+          @for (member of members(); track member.id) {
+            <div class="member-item">
+              <div class="member-avatar" [class]="getRoleBadgeClass(member.role)">
+                {{ member.fullName.substring(0, 1).toUpperCase() }}
+              </div>
+              <div class="member-info">
+                <span class="member-name">
+                  {{ member.fullName }}
+                  @if (isCurrentUser(member.userId)) {
+                    <span class="you-badge">(Bạn)</span>
+                  }
+                </span>
+                <span class="member-email">{{ member.email }}</span>
+              </div>
+              <span class="role-badge" [class]="getRoleBadgeClass(member.role)">
+                {{ member.role }}
+              </span>
+              @if (member.role !== 'Owner' && !isCurrentUser(member.userId)) {
+                <button class="btn-remove" (click)="removeMember(member)" title="Xóa thành viên">
+                  <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                  </svg>
+                </button>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

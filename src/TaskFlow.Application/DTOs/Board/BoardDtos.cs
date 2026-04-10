@@ -49,6 +49,8 @@ public class UpdateTaskRequest
     public Priority? Priority { get; set; }
     public DateTime? DueDate { get; set; }
     public bool ClearDueDate { get; set; } = false;
+    public string? AssigneeId { get; set; }
+    public bool ClearAssignee { get; set; } = false;
 }
 
 public class TaskCommentDto

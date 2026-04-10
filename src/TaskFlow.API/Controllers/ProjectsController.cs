@@ -72,4 +72,50 @@ public class ProjectsController : ControllerBase
             return NotFound(new { message = ex.Message });
         }
     }
+
+    [HttpGet("{id}/members")]
+    public async Task<ActionResult<List<ProjectMemberDto>>> GetMembers(Guid id)
+    {
+        var members = await _projectService.GetMembersAsync(id);
+        return Ok(members);
+    }
+
+    [HttpPost("{id}/members")]
+    public async Task<ActionResult<ProjectMemberDto>> AddMember(Guid id, [FromBody] AddMemberRequest request)
+    {
+        try
+        {
+            var member = await _projectService.AddMemberAsync(id, request.Email);
+            return Ok(member);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpDelete("{id}/members/{memberId}")]
+    public async Task<IActionResult> RemoveMember(Guid id, Guid memberId)
+    {
+        try
+        {
+            await _projectService.RemoveMemberAsync(id, memberId);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpGet("users/search")]
+    public async Task<ActionResult<List<UserSearchDto>>> SearchUsers(
+        [FromQuery] string q, [FromQuery] Guid projectId)
+    {
+        if (string.IsNullOrWhiteSpace(q) || q.Length < 2)
+            return Ok(new List<UserSearchDto>());
+
+        var users = await _projectService.SearchUsersAsync(q, projectId);
+        return Ok(users);
+    }
 }

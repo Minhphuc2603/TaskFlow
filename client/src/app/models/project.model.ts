@@ -71,4 +71,21 @@ export interface UpdateTaskRequest {
   priority?: Priority;
   dueDate?: string | null;
   clearDueDate?: boolean;
+  assigneeId?: string | null;
+  clearAssignee?: boolean;
+}
+
+export interface ProjectMember {
+  id: string;
+  userId: string;
+  fullName: string;
+  email: string;
+  role: string;
+  joinedAt: string;
+}
+
+export interface UserSearchResult {
+  userId: string;
+  fullName: string;
+  email: string;
 }

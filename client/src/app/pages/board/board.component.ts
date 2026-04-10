@@ -4,16 +4,18 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { BoardService } from '../../services/board.service';
-import { Board, TaskItem } from '../../models/project.model';
+import { ProjectService } from '../../services/project.service';
+import { Board, TaskItem, ProjectMember } from '../../models/project.model';
 import { TaskCardComponent } from './components/task-card/task-card.component';
 import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
 import { TaskDetailComponent } from './components/task-detail/task-detail.component';
+import { MemberDialogComponent } from '../dashboard/components/member-dialog/member-dialog.component';
 import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-board',
   standalone: true,
-  imports: [CommonModule, DragDropModule, RouterLink, FormsModule, TaskCardComponent, ConfirmDialogComponent, TaskDetailComponent],
+  imports: [CommonModule, DragDropModule, RouterLink, FormsModule, TaskCardComponent, ConfirmDialogComponent, TaskDetailComponent, MemberDialogComponent],
   templateUrl: './board.component.html',
   styleUrl: './board.component.scss'
 })
@@ -24,6 +26,8 @@ export class BoardComponent implements OnInit {
   taskToDelete = signal<{ taskId: string, columnId: string } | null>(null);
   columnToDelete = signal<{ id: string, name: string } | null>(null);
   selectedTask = signal<{ task: TaskItem, columnName: string } | null>(null);
+  members = signal<ProjectMember[]>([]);
+  showMemberDialog = signal(false);
   newTaskTitle = '';
 
   isAddingColumn = signal(false);
@@ -35,6 +39,7 @@ export class BoardComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private boardService: BoardService,
+    private projectService: ProjectService,
     public themeService: ThemeService
   ) { }
 
@@ -44,11 +49,8 @@ export class BoardComponent implements OnInit {
       this.boardService.getBoardsByProject(projectId).subscribe({
         next: (boards) => {
           if (boards && boards.length > 0) {
-            // Sort columns logically based on order
             boards[0].columns.sort((a, b) => a.order - b.order);
-            // Sort tasks inside each column
             boards[0].columns.forEach(c => c.tasks.sort((t1, t2) => t1.order - t2.order));
-
             this.board.set(boards[0]);
           }
           this.isLoading.set(false);
@@ -56,6 +58,11 @@ export class BoardComponent implements OnInit {
         error: () => {
           this.isLoading.set(false);
         }
+      });
+
+      // Load project members
+      this.projectService.getMembers(projectId).subscribe({
+        next: (members) => this.members.set(members)
       });
     }
   }

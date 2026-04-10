@@ -29,7 +29,8 @@ public class BoardService : IBoardService
 
         if (board == null) return null;
 
-        return MapToDto(board);
+        var assigneeMap = await BuildAssigneeMapAsync(board);
+        return MapToDto(board, assigneeMap);
     }
 
     public async Task<List<BoardDto>> GetBoardsByProjectIdAsync(Guid projectId)
@@ -45,7 +46,22 @@ public class BoardService : IBoardService
                     .ThenInclude(t => t.Comments)
             .ToListAsync();
 
-        return boards.Select(MapToDto).ToList();
+        // Batch load all assignee names across all boards
+        var allAssigneeIds = boards
+            .SelectMany(b => b.Columns)
+            .SelectMany(c => c.Tasks)
+            .Where(t => t.AssigneeId != null)
+            .Select(t => t.AssigneeId!)
+            .Distinct()
+            .ToList();
+
+        var assigneeMap = allAssigneeIds.Count > 0
+            ? await _context.Users
+                .Where(u => allAssigneeIds.Contains(u.Id))
+                .ToDictionaryAsync(u => u.Id, u => u.FullName)
+            : new Dictionary<string, string>();
+
+        return boards.Select(b => MapToDto(b, assigneeMap)).ToList();
     }
 
     public async Task<BoardDto> CreateBoardAsync(Guid projectId, string name)
@@ -193,8 +209,20 @@ public class BoardService : IBoardService
         if (request.Priority.HasValue) task.Priority = request.Priority.Value;
         if (request.ClearDueDate) task.DueDate = null;
         else if (request.DueDate.HasValue) task.DueDate = request.DueDate.Value;
+        if (request.ClearAssignee) task.AssigneeId = null;
+        else if (request.AssigneeId != null) task.AssigneeId = request.AssigneeId;
 
         await _context.SaveChangesAsync();
+
+        // Resolve assignee name
+        string? assigneeName = null;
+        if (task.AssigneeId != null)
+        {
+            assigneeName = await _context.Users
+                .Where(u => u.Id == task.AssigneeId)
+                .Select(u => u.FullName)
+                .FirstOrDefaultAsync();
+        }
 
         return new TaskItemDto
         {
@@ -205,6 +233,7 @@ public class BoardService : IBoardService
             Priority = task.Priority,
             DueDate = task.DueDate,
             AssigneeId = task.AssigneeId,
+            AssigneeName = assigneeName,
             ColumnId = task.ColumnId,
             CommentCount = task.Comments.Count,
             Labels = [.. task.Labels.Select(l => new TaskLabelDto
@@ -262,7 +291,23 @@ public class BoardService : IBoardService
         };
     }
 
-    private static BoardDto MapToDto(Board board)
+    private async Task<Dictionary<string, string>> BuildAssigneeMapAsync(Board board)
+    {
+        var assigneeIds = board.Columns
+            .SelectMany(c => c.Tasks)
+            .Where(t => t.AssigneeId != null)
+            .Select(t => t.AssigneeId!)
+            .Distinct()
+            .ToList();
+
+        if (assigneeIds.Count == 0) return new Dictionary<string, string>();
+
+        return await _context.Users
+            .Where(u => assigneeIds.Contains(u.Id))
+            .ToDictionaryAsync(u => u.Id, u => u.FullName);
+    }
+
+    private static BoardDto MapToDto(Board board, Dictionary<string, string> assigneeMap)
     {
         return new BoardDto
         {
@@ -285,6 +330,7 @@ public class BoardService : IBoardService
                     Priority = t.Priority,
                     DueDate = t.DueDate,
                     AssigneeId = t.AssigneeId,
+                    AssigneeName = t.AssigneeId != null && assigneeMap.TryGetValue(t.AssigneeId, out var name) ? name : null,
                     ColumnId = t.ColumnId,
                     CommentCount = t.Comments.Count,
                     Labels = [.. t.Labels.Select(l => new TaskLabelDto

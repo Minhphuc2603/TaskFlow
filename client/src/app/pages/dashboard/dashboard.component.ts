@@ -6,12 +6,13 @@ import { AuthService } from '../../services/auth.service';
 import { ProjectService } from '../../services/project.service';
 import { Project } from '../../models/project.model';
 import { ConfirmDialogComponent } from '../board/components/confirm-dialog/confirm-dialog.component';
+import { MemberDialogComponent } from './components/member-dialog/member-dialog.component';
 import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, ConfirmDialogComponent],
+  imports: [CommonModule, FormsModule, ConfirmDialogComponent, MemberDialogComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
@@ -22,6 +23,7 @@ export class DashboardComponent implements OnInit {
   newProjectName = '';
   newProjectDescription = '';
   projectToDelete = signal<Project | null>(null);
+  memberProject = signal<Project | null>(null);
 
   private gradients = [
     'linear-gradient(135deg, #6366f1, #8b5cf6)',
@@ -108,6 +110,11 @@ export class DashboardComponent implements OnInit {
   getUserInitials(): string {
     const name = this.authService.currentUser()?.fullName || '';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+  }
+
+  openMembers(event: Event, project: Project): void {
+    event.stopPropagation();
+    this.memberProject.set(project);
   }
 
   logout(): void {

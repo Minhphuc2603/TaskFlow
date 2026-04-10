@@ -19,3 +19,11 @@
 </div>
 
 <p class="task-title">{{ task.title }}</p>
+@if (task.assigneeName) {
+  <div class="task-footer">
+    <div class="assignee-chip">
+      <span class="chip-avatar">{{ task.assigneeName.substring(0, 1).toUpperCase() }}</span>
+      <span class="chip-name">{{ task.assigneeName }}</span>
+    </div>
+  </div>
+}

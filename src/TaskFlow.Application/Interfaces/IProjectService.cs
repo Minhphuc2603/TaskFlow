@@ -9,4 +9,9 @@ public interface IProjectService
     Task<ProjectDto> CreateProjectAsync(CreateProjectDto dto, string userId);
     Task<ProjectDto> UpdateProjectAsync(Guid projectId, CreateProjectDto dto);
     Task DeleteProjectAsync(Guid projectId);
+    Task<List<ProjectMemberDto>> GetMembersAsync(Guid projectId);
+    Task<ProjectMemberDto> AddMemberAsync(Guid projectId, string email);
+    Task RemoveMemberAsync(Guid projectId, Guid memberId);
+    Task<List<UserSearchDto>> SearchUsersAsync(string query, Guid projectId);
 }
+

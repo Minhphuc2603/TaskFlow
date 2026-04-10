@@ -151,4 +151,91 @@ public class ProjectService : IProjectService
         _context.Projects.Remove(project);
         await _context.SaveChangesAsync();
     }
+
+    public async Task<List<ProjectMemberDto>> GetMembersAsync(Guid projectId)
+    {
+        var members = await _context.ProjectMembers
+            .Where(pm => pm.ProjectId == projectId)
+            .Join(_context.Users,
+                  pm => pm.UserId,
+                  u => u.Id,
+                  (pm, u) => new ProjectMemberDto
+                  {
+                      Id = pm.Id,
+                      UserId = pm.UserId,
+                      FullName = u.FullName,
+                      Email = u.Email ?? "",
+                      Role = pm.Role.ToString(),
+                      JoinedAt = pm.CreatedAt
+                  })
+            .ToListAsync();
+
+        return members;
+    }
+
+    public async Task<ProjectMemberDto> AddMemberAsync(Guid projectId, string email)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        if (user == null)
+            throw new Exception("Không tìm thấy người dùng với email này. Họ cần đăng ký tài khoản trước.");
+
+        var existing = await _context.ProjectMembers
+            .AnyAsync(pm => pm.ProjectId == projectId && pm.UserId == user.Id);
+        if (existing)
+            throw new Exception("Người dùng này đã là thành viên của dự án.");
+
+        var member = new ProjectMember
+        {
+            ProjectId = projectId,
+            UserId = user.Id,
+            Role = ProjectRole.Member
+        };
+
+        _context.ProjectMembers.Add(member);
+        await _context.SaveChangesAsync();
+
+        return new ProjectMemberDto
+        {
+            Id = member.Id,
+            UserId = user.Id,
+            FullName = user.FullName,
+            Email = user.Email ?? "",
+            Role = "Member",
+            JoinedAt = member.CreatedAt
+        };
+    }
+
+    public async Task RemoveMemberAsync(Guid projectId, Guid memberId)
+    {
+        var member = await _context.ProjectMembers
+            .FirstOrDefaultAsync(pm => pm.Id == memberId && pm.ProjectId == projectId);
+        if (member == null) throw new Exception("Thành viên không tồn tại.");
+        if (member.Role == ProjectRole.Owner)
+            throw new Exception("Không thể xóa chủ sở hữu dự án.");
+
+        _context.ProjectMembers.Remove(member);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<List<UserSearchDto>> SearchUsersAsync(string query, Guid projectId)
+    {
+        var existingMemberIds = await _context.ProjectMembers
+            .Where(pm => pm.ProjectId == projectId)
+            .Select(pm => pm.UserId)
+            .ToListAsync();
+
+        var users = await _context.Users
+            .Where(u => !existingMemberIds.Contains(u.Id) &&
+                        (u.Email!.Contains(query) || u.FullName.Contains(query)))
+            .Take(10)
+            .Select(u => new UserSearchDto
+            {
+                UserId = u.Id,
+                FullName = u.FullName,
+                Email = u.Email ?? ""
+            })
+            .ToListAsync();
+
+        return users;
+    }
 }

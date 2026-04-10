@@ -64,6 +64,37 @@
             (change)="saveDueDate()"
           />
         </div>
+
+        <!-- Assignee -->
+        <div class="meta-item">
+          <label>Người được giao</label>
+          <div class="assignee-select">
+            <button class="assignee-btn" (click)="showAssigneeDropdown = !showAssigneeDropdown">
+              @if (task.assigneeId) {
+                <span class="assignee-avatar">{{ getAssigneeName().substring(0, 1).toUpperCase() }}</span>
+                <span>{{ getAssigneeName() }}</span>
+              } @else {
+                <span class="assignee-placeholder">Chưa gán</span>
+              }
+              <span class="chevron">▼</span>
+            </button>
+            @if (showAssigneeDropdown) {
+              <div class="assignee-dropdown">
+                <button class="assignee-option unassign" (click)="saveAssignee(null)">
+                  ✕ Bỏ gán
+                </button>
+                @for (member of members; track member.id) {
+                  <button class="assignee-option"
+                          [class.active]="task.assigneeId === member.userId"
+                          (click)="saveAssignee(member.userId)">
+                    <span class="option-avatar">{{ member.fullName.substring(0, 1).toUpperCase() }}</span>
+                    {{ member.fullName }}
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        </div>
       </div>
 
       <!-- Description -->
