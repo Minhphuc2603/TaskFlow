@@ -69,9 +69,14 @@
         <div class="meta-item">
           <label>Người được giao</label>
           <div class="assignee-select">
-            <button class="assignee-btn" (click)="showAssigneeDropdown = !showAssigneeDropdown">
+            <button
+              class="assignee-btn"
+              (click)="showAssigneeDropdown = !showAssigneeDropdown"
+            >
               @if (task.assigneeId) {
-                <span class="assignee-avatar">{{ getAssigneeName().substring(0, 1).toUpperCase() }}</span>
+                <span class="assignee-avatar">{{
+                  getAssigneeName().substring(0, 1).toUpperCase()
+                }}</span>
                 <span>{{ getAssigneeName() }}</span>
               } @else {
                 <span class="assignee-placeholder">Chưa gán</span>
@@ -80,14 +85,21 @@
             </button>
             @if (showAssigneeDropdown) {
               <div class="assignee-dropdown">
-                <button class="assignee-option unassign" (click)="saveAssignee(null)">
+                <button
+                  class="assignee-option unassign"
+                  (click)="saveAssignee(null)"
+                >
                   ✕ Bỏ gán
                 </button>
                 @for (member of members; track member.id) {
-                  <button class="assignee-option"
-                          [class.active]="task.assigneeId === member.userId"
-                          (click)="saveAssignee(member.userId)">
-                    <span class="option-avatar">{{ member.fullName.substring(0, 1).toUpperCase() }}</span>
+                  <button
+                    class="assignee-option"
+                    [class.active]="task.assigneeId === member.userId"
+                    (click)="saveAssignee(member.userId)"
+                  >
+                    <span class="option-avatar">{{
+                      member.fullName.substring(0, 1).toUpperCase()
+                    }}</span>
                     {{ member.fullName }}
                   </button>
                 }
@@ -109,23 +121,64 @@
         ></textarea>
       </div>
 
+      <!--Label-->
       <!-- Labels -->
-      @if (task.labels.length > 0) {
-        <div class="labels-section">
-          <label>Nhãn</label>
-          <div class="labels-list">
-            @for (label of task.labels; track label.id) {
-              <span
-                class="label-tag"
-                [style.color]="label.color"
-                [style.backgroundColor]="label.color + '20'"
-              >
-                {{ label.name }}
-              </span>
+      <div class="labels-section">
+        <label>Nhãn</label>
+        <div class="labels-list">
+          <!-- Lặp qua các nhãn đang có -->
+          @for (label of task.labels; track label.id) {
+            <span
+              class="label-tag"
+              [style.color]="label.color"
+              [style.backgroundColor]="label.color + '20'"
+            >
+              {{ label.name }}
+              <button class="btn-remove-label" (click)="deleteLabel(label.id)">
+                ×
+              </button>
+            </span>
+          }
+
+          <!-- Nút cộng thêm nhãn & Popup chọn màu -->
+          <div class="add-label-container">
+            <button class="btn-add-label" (click)="openLabelPopup()">
+              + Thêm
+            </button>
+
+            @if (showLabelPopup) {
+              <div class="label-popup">
+                <input
+                  type="text"
+                  [(ngModel)]="newLabelName"
+                  placeholder="Tên nhãn mới..."
+                  class="label-input"
+                  (keydown.enter)="addLabel()"
+                  autofocus
+                />
+
+                <div class="color-picker">
+                  @for (color of presetColors; track color) {
+                    <button
+                      class="color-circle"
+                      [style.backgroundColor]="color"
+                      [class.selected]="selectedColor === color"
+                      (click)="selectedColor = color"
+                    ></button>
+                  }
+                </div>
+                <button
+                  class="btn-primary btn-sm"
+                  style="width: 100%"
+                  (click)="addLabel()"
+                >
+                  Tạo mới
+                </button>
+              </div>
             }
           </div>
         </div>
-      }
+      </div>
 
       <!-- Comments -->
       <div class="comments-section">

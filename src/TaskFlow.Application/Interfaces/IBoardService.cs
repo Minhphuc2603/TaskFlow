@@ -16,4 +16,6 @@ public interface IBoardService
     Task DeleteColumnAsync(Guid columnId);
     Task<BoardColumnDto> AddColumnAsync(Guid boardId, string name, string color);
     Task<BoardDto?> GetBoardByColumnIdAsync(Guid columnId);
+    Task<TaskLabelDto> AddTaskLabelAsync(Guid taskId, string name, string color);
+    Task DeleteTaskLabelAsync(Guid taskId, Guid labelId);
 }

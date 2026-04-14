@@ -27,7 +27,14 @@ export class TaskDetailComponent implements OnInit, OnChanges {
   editPriority: Priority = Priority.None;
   editDueDate = '';
   showAssigneeDropdown = false;
-
+  showLabelPopup = false;
+  newLabelName = "";
+  presetColors = [
+    '#ef4444', '#f97316', '#f59e0b', '#84cc16',
+    '#10b981', '#06b6d4', '#3b82f6', '#8b5cf6',
+    '#ec4899', '#64748b'
+  ];
+  selectedColor = this.presetColors[7];
   Priority = Priority;
 
   priorityOptions = [
@@ -164,5 +171,29 @@ export class TaskDetailComponent implements OnInit, OnChanges {
     if (!this.task.assigneeId) return '';
     const member = this.members.find(m => m.userId === this.task.assigneeId);
     return member?.fullName || this.task.assigneeName || 'Unknown';
+  }
+
+  openLabelPopup() {
+    this.showLabelPopup = !this.showLabelPopup;
+    this.newLabelName = "";
+  }
+
+  addLabel() {
+    if (!this.newLabelName.trim()) return;
+    this.boardService.addTaskLabel(this.task.id, this.newLabelName, this.selectedColor).subscribe({
+      next: (newLablel) => {
+        this.task.labels.push(newLablel);
+        this.showLabelPopup = false
+      }
+    })
+  }
+
+  deleteLabel(labelId: string) {
+    this.boardService.deleteTaskLabel(this.task.id, labelId)
+      .subscribe({
+        next: () => {
+          this.task.labels = this.task.labels.filter(l => l.id !== labelId);
+        }
+      });
   }
 }

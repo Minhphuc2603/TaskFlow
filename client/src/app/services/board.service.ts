@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Board, TaskItem, TaskComment, UpdateTaskRequest, BoardColumn } from '../models/project.model';
+import { Board, TaskItem, TaskComment, UpdateTaskRequest, BoardColumn, TaskLabel } from '../models/project.model';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +10,7 @@ import { Board, TaskItem, TaskComment, UpdateTaskRequest, BoardColumn } from '..
 export class BoardService {
   private apiUrl = `${environment.apiUrl}/boards`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getBoard(id: string): Observable<Board> {
     return this.http.get<Board>(`${this.apiUrl}/${id}`);
@@ -64,5 +64,13 @@ export class BoardService {
       color
     });
   }
+  addTaskLabel(taskId: string, name: string, color: string): Observable<TaskLabel> {
+    return this.http.post<TaskLabel>(`${this.apiUrl}/tasks/${taskId}/labels`, { name, color });
+  }
+
+  deleteTaskLabel(taskId: string, labelId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/tasks/${taskId}/labels/${labelId}`);
+  }
+
 }
 

@@ -172,27 +172,30 @@ public class BoardsController : ControllerBase
             return BadRequest(new { message = ex.Message });
         }
     }
-}
-
-public class AddColumnRequest
-{
-    public string Name { get; set; } = string.Empty;
-    public string Color { get; set; } = string.Empty;
-}
-
-public class AddTaskRequest
-{
-    public string Title { get; set; } = string.Empty;
-    public string? Description { get; set; }
-}
-
-public class CreateBoardRequest
-{
-    public string Name { get; set; } = string.Empty;
-}
-
-public class MoveTaskRequest
-{
-    public Guid TargetColumnId { get; set; }
-    public int NewOrder { get; set; }
+    [HttpPost("tasks/{taskId}/labels")]
+    public async Task<ActionResult<TaskLabelDto>> AddLabel(Guid taskId, [FromBody] AddTaskLabelRequest request)
+    {
+        try
+        {
+            var label = await _boardService.AddTaskLabelAsync(taskId, request.Name, request.Color);
+            return Ok(label);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+    [HttpDelete("tasks/{taskId}/labels/{labelId}")]
+    public async Task<IActionResult> DeleteTaskLabel(Guid taskId, Guid labelId)
+    {
+        try
+        {
+            await _boardService.DeleteTaskLabelAsync(taskId, labelId);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
 }

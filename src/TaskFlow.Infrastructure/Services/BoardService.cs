@@ -396,4 +396,32 @@ public class BoardService(ApplicationDbContext context) : IBoardService
             Tasks = []
         };
     }
+
+    public async Task<TaskLabelDto> AddTaskLabelAsync(Guid taskId, string name, string color)
+    {
+        //Kiểm tra task tồn tại hay ko ?
+        _ = await _context.TaskItems.FindAsync(taskId) ?? throw new Exception("Task not found.");
+        //Tạo một nhãn mới 
+        var label = new TaskLabel
+        {
+            Name = name,
+            Color = color,
+            TaskItemId = taskId
+        };
+        _context.TaskLabels.Add(label);
+        await _context.SaveChangesAsync();
+        return new TaskLabelDto
+        {
+            Id = label.Id,
+            Name = label.Name,
+            Color = label.Color
+        };
+    }   
+
+    public async  Task DeleteTaskLabelAsync(Guid taskId, Guid labelId)
+    {
+        var label = await _context.TaskLabels.FirstOrDefaultAsync(l => l.Id == labelId && l.TaskItemId == taskId) ?? throw new Exception("Label not found.");
+        _context.TaskLabels.Remove(label);
+        await _context.SaveChangesAsync();
+    }
 }

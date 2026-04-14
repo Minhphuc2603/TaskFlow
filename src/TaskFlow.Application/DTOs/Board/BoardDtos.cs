@@ -66,3 +66,30 @@ public class AddCommentRequest
 {
     public string Content { get; set; } = string.Empty;
 }
+public class  AddTaskLabelRequest
+{
+    public string Name { get; set; } = string.Empty;
+    public string Color { get; set; } = string.Empty;
+}
+public class AddColumnRequest
+{
+    public string Name { get; set; } = string.Empty;
+    public string Color { get; set; } = string.Empty;
+}
+
+public class AddTaskRequest
+{
+    public string Title { get; set; } = string.Empty;
+    public string? Description { get; set; }
+}
+
+public class CreateBoardRequest
+{
+    public string Name { get; set; } = string.Empty;
+}
+
+public class MoveTaskRequest
+{
+    public Guid TargetColumnId { get; set; }
+    public int NewOrder { get; set; }
+}
