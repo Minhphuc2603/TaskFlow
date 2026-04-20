@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Board, TaskItem, TaskComment, UpdateTaskRequest, BoardColumn, TaskLabel } from '../models/project.model';
+import { Board, TaskItem, TaskComment, UpdateTaskRequest, BoardColumn, TaskLabel, TaskChecklist } from '../models/project.model';
 
 @Injectable({
   providedIn: 'root'
@@ -71,6 +71,21 @@ export class BoardService {
   deleteTaskLabel(taskId: string, labelId: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/tasks/${taskId}/labels/${labelId}`);
   }
+
+  addChecklist(taskId: string, title: string): Observable<TaskChecklist> {
+    return this.http.post<TaskChecklist>(`${this.apiUrl}/tasks/${taskId}/checklists`, { title });
+  }
+
+  updateChecklist(taskId: string, checklistId: string, title: string, isCompleted: boolean): Observable<TaskChecklist> {
+    return this.http.put<TaskChecklist>(`${this.apiUrl}/tasks/${taskId}/checklists/${checklistId}`, { title, isCompleted });
+  }
+
+  deleteChecklist(taskId: string, checklistId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/tasks/${taskId}/checklists/${checklistId}`);
+  }
+  moveColumn(boardId: string, columnId: string, newOrder: number): Observable<void> {
+  return this.http.put<void>(`${this.apiUrl}/${boardId}/columns/${columnId}/move`, { newOrder });
+}
 
 }
 

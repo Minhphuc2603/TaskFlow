@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TaskFlow.Infrastructure.Data;
@@ -11,9 +12,11 @@ using TaskFlow.Infrastructure.Data;
 namespace TaskFlow.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260420084652_Setup_database")]
+    partial class Setup_database
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -296,42 +299,6 @@ namespace TaskFlow.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("ProjectMembers");
-                });
-
-            modelBuilder.Entity("TaskFlow.Domain.Entities.TaskChecklist", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsCompleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<Guid>("TaskItemId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TaskItemId");
-
-                    b.ToTable("TaskChecklists");
                 });
 
             modelBuilder.Entity("TaskFlow.Domain.Entities.TaskComment", b =>
@@ -622,17 +589,6 @@ namespace TaskFlow.Infrastructure.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("TaskFlow.Domain.Entities.TaskChecklist", b =>
-                {
-                    b.HasOne("TaskFlow.Domain.Entities.TaskItem", "TaskItem")
-                        .WithMany("Checklists")
-                        .HasForeignKey("TaskItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("TaskItem");
-                });
-
             modelBuilder.Entity("TaskFlow.Domain.Entities.TaskComment", b =>
                 {
                     b.HasOne("TaskFlow.Domain.Entities.TaskItem", "TaskItem")
@@ -685,8 +641,6 @@ namespace TaskFlow.Infrastructure.Migrations
 
             modelBuilder.Entity("TaskFlow.Domain.Entities.TaskItem", b =>
                 {
-                    b.Navigation("Checklists");
-
                     b.Navigation("Comments");
 
                     b.Navigation("Labels");

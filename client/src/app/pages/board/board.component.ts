@@ -6,7 +6,7 @@ import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from 
 import { BoardService } from '../../services/board.service';
 import { ProjectService } from '../../services/project.service';
 import { AuthService } from '../../services/auth.service';
-import { Board, TaskItem, ProjectMember } from '../../models/project.model';
+import { Board, TaskItem, ProjectMember, BoardColumn } from '../../models/project.model';
 import { TaskCardComponent } from './components/task-card/task-card.component';
 import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
 import { TaskDetailComponent } from './components/task-detail/task-detail.component';
@@ -253,4 +253,20 @@ export class BoardComponent implements OnInit {
       }
     }
   }
+  dropColumn(event: CdkDragDrop<BoardColumn[]>) {
+  const currentBoard = this.board();
+  if (!currentBoard || event.previousIndex === event.currentIndex) return;
+  // 1. Cập nhật vị trí trên giao diện người dùng
+  moveItemInArray(currentBoard.columns, event.previousIndex, event.currentIndex);
+  // 2. Cập nhật thuộc tính '.order' đồng nhất
+  currentBoard.columns.forEach((col, index) => col.order = index);
+  // 3. Gọi server để lưu
+  const movedColumn = currentBoard.columns[event.currentIndex];
+  this.boardService.moveColumn(currentBoard.id, movedColumn.id, event.currentIndex)
+    .subscribe({
+      next: () => console.log('Đã cập nhật vị trí cột lên Server'),
+      error: (err) => console.error('Lỗi khi đổi chỗ cột:', err)
+    });
+}
+
 }

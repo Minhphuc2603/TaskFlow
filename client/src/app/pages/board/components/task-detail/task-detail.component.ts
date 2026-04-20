@@ -29,6 +29,7 @@ export class TaskDetailComponent implements OnInit, OnChanges {
   showAssigneeDropdown = false;
   showLabelPopup = false;
   newLabelName = "";
+  newChecklistTitle = '';
   presetColors = [
     '#ef4444', '#f97316', '#f59e0b', '#84cc16',
     '#10b981', '#06b6d4', '#3b82f6', '#8b5cf6',
@@ -195,5 +196,39 @@ export class TaskDetailComponent implements OnInit, OnChanges {
           this.task.labels = this.task.labels.filter(l => l.id !== labelId);
         }
       });
+  }
+
+  get checklistProgress(): number {
+    if (!this.task.checklists || this.task.checklists.length === 0) return 0;
+    const completed = this.task.checklists.filter(c => c.isCompleted).length;
+    return Math.round((completed / this.task.checklists.length) * 100);
+  }
+
+  addChecklist() {
+    if (!this.newChecklistTitle.trim()) return;
+    this.boardService.addChecklist(this.task.id, this.newChecklistTitle.trim()).subscribe({
+      next: (checklist) => {
+        if (!this.task.checklists) this.task.checklists = [];
+        this.task.checklists.push(checklist);
+        this.newChecklistTitle = '';
+      }
+    });
+  }
+
+  toggleChecklist(checklist: any) {
+    const newVal = !checklist.isCompleted;
+    this.boardService.updateChecklist(this.task.id, checklist.id, checklist.title, newVal).subscribe({
+      next: (updated) => {
+        checklist.isCompleted = updated.isCompleted;
+      }
+    });
+  }
+
+  deleteChecklist(checklistId: string) {
+    this.boardService.deleteChecklist(this.task.id, checklistId).subscribe({
+      next: () => {
+        this.task.checklists = this.task.checklists.filter(c => c.id !== checklistId);
+      }
+    });
   }
 }

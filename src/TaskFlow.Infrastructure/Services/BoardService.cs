@@ -21,6 +21,9 @@ public class BoardService(ApplicationDbContext context) : IBoardService
             .Include(b => b.Columns)
                 .ThenInclude(c => c.Tasks)
                     .ThenInclude(t => t.Comments)
+            .Include(b => b.Columns)
+                .ThenInclude(c => c.Tasks)
+                    .ThenInclude(t => t.Checklists.OrderBy(ch => ch.CreatedAt))
             .FirstOrDefaultAsync(b => b.Id == boardId);
 
         if (board == null) return null;
@@ -40,6 +43,9 @@ public class BoardService(ApplicationDbContext context) : IBoardService
             .Include(b => b.Columns)
                 .ThenInclude(c => c.Tasks)
                     .ThenInclude(t => t.Comments)
+            .Include(b => b.Columns)
+                .ThenInclude(c => c.Tasks)
+                    .ThenInclude(t => t.Checklists.OrderBy(ch => ch.CreatedAt))
             .ToListAsync();
 
         // Batch load all assignee names across all boards
@@ -165,7 +171,8 @@ public class BoardService(ApplicationDbContext context) : IBoardService
             Priority = task.Priority,
             ColumnId = task.ColumnId,
             CommentCount = 0,
-            Labels = []
+            Labels = [],
+            Checklists = []
         };
     }
 
@@ -196,6 +203,7 @@ public class BoardService(ApplicationDbContext context) : IBoardService
         var task = await _context.TaskItems
             .Include(t => t.Labels)
             .Include(t => t.Comments)
+            .Include(t => t.Checklists.OrderBy(ch => ch.CreatedAt))
             .FirstOrDefaultAsync(t => t.Id == taskId);
 
         if (task == null) throw new Exception("Task not found.");
@@ -350,6 +358,12 @@ public class BoardService(ApplicationDbContext context) : IBoardService
                         Id = l.Id,
                         Name = l.Name,
                         Color = l.Color
+                    })],
+                    Checklists = [.. t.Checklists.OrderBy(ch => ch.CreatedAt).Select(ch => new TaskChecklistDto
+                    {
+                        Id = ch.Id,
+                        Title = ch.Title,
+                        IsCompleted = ch.IsCompleted
                     })]
                 })]
             })]
@@ -425,4 +439,76 @@ public class BoardService(ApplicationDbContext context) : IBoardService
         _context.TaskLabels.Remove(label);
         await _context.SaveChangesAsync();
     }
+
+    public async Task<TaskChecklistDto> AddChecklistAsync(Guid taskId, string title)
+    {
+        _ = await _context.TaskItems.FindAsync(taskId) ?? throw new Exception("Task not found.");
+        
+        var checklist = new TaskChecklist
+        {
+            Title = title,
+            IsCompleted = false,
+            TaskItemId = taskId
+        };
+        
+        _context.TaskChecklists.Add(checklist);
+        await _context.SaveChangesAsync();
+        
+        return new TaskChecklistDto
+        {
+            Id = checklist.Id,
+            Title = checklist.Title,
+            IsCompleted = checklist.IsCompleted
+        };
+    }
+
+    public async Task<TaskChecklistDto> UpdateChecklistAsync(Guid taskId, Guid checklistId, string title, bool isCompleted)
+    {
+        var checklist = await _context.TaskChecklists.FirstOrDefaultAsync(c => c.Id == checklistId && c.TaskItemId == taskId) 
+            ?? throw new Exception("Checklist not found.");
+            
+        checklist.Title = title;
+        checklist.IsCompleted = isCompleted;
+        
+        await _context.SaveChangesAsync();
+        
+        return new TaskChecklistDto
+        {
+            Id = checklist.Id,
+            Title = checklist.Title,
+            IsCompleted = checklist.IsCompleted
+        };
+    }
+
+    public async Task DeleteChecklistAsync(Guid taskId, Guid checklistId)
+    {
+        var checklist = await _context.TaskChecklists.FirstOrDefaultAsync(c => c.Id == checklistId && c.TaskItemId == taskId) 
+            ?? throw new Exception("Checklist not found.");
+            
+        _context.TaskChecklists.Remove(checklist);
+        await _context.SaveChangesAsync();
+    }
+    public async Task MoveColumnAsync(Guid boardId, Guid columId, int newOrder)
+    {
+        var board = await _context.Boards
+            .Include(b => b.Columns)
+            .FirstOrDefaultAsync(b => b.Id == boardId) ?? throw new Exception("Board not found");
+        var column = board.Columns.FirstOrDefault(c => c.Id == columId) 
+            ?? throw new Exception("Column not found");
+        int oldOrder = column.Order;
+        if (oldOrder == newOrder) return;
+        //Sap xep lai thu tu cac cot 
+        var orderedColumns = board.Columns.OrderBy(c => c.Order).ToList();
+        orderedColumns.Remove(column);
+        //Dam bao newOrder khong vuot qua gioi han mang 
+        newOrder = Math.Clamp(newOrder, 0, orderedColumns.Count);
+        orderedColumns.Insert(newOrder, column);
+        //Cap nhat lai thuoc tinh Order cho khop voi mang moi 
+        for ( int i = 0; i < orderedColumns.Count; i++)
+        {
+            orderedColumns[i].Order = i;
+        }
+        await _context.SaveChangesAsync();
+    }
+
 }

@@ -198,4 +198,60 @@ public class BoardsController : ControllerBase
             return BadRequest(new { message = ex.Message });
         }
     }
+
+    [HttpPost("tasks/{taskId}/checklists")]
+    public async Task<ActionResult<TaskChecklistDto>> AddChecklist(Guid taskId, [FromBody] AddChecklistRequest request)
+    {
+        try
+        {
+            var checklist = await _boardService.AddChecklistAsync(taskId, request.Title);
+            return Ok(checklist);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpPut("tasks/{taskId}/checklists/{checklistId}")]
+    public async Task<ActionResult<TaskChecklistDto>> UpdateChecklist(Guid taskId, Guid checklistId, [FromBody] UpdateChecklistRequest request)
+    {
+        try
+        {
+            var checklist = await _boardService.UpdateChecklistAsync(taskId, checklistId, request.Title, request.IsCompleted);
+            return Ok(checklist);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpDelete("tasks/{taskId}/checklists/{checklistId}")]
+    public async Task<IActionResult> DeleteChecklist(Guid taskId, Guid checklistId)
+    {
+        try
+        {
+            await _boardService.DeleteChecklistAsync(taskId, checklistId);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+    [HttpPut("{boardId}/columns/{columnId}/move")]
+    public async Task<IActionResult> MoveColumn(Guid boardId, Guid columnId, [FromBody] MoveColumRequest request)
+    {
+        try
+        {
+            await _boardService.MoveColumnAsync(boardId, columnId, request.NewOrder);
+            return Ok();
+
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
 }

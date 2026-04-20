@@ -18,4 +18,8 @@ public interface IBoardService
     Task<BoardDto?> GetBoardByColumnIdAsync(Guid columnId);
     Task<TaskLabelDto> AddTaskLabelAsync(Guid taskId, string name, string color);
     Task DeleteTaskLabelAsync(Guid taskId, Guid labelId);
+    Task<TaskChecklistDto> AddChecklistAsync(Guid taskId, string title);
+    Task<TaskChecklistDto> UpdateChecklistAsync(Guid taskId, Guid checklistId, string title, bool isCompleted);
+    Task DeleteChecklistAsync(Guid taskId, Guid checklistId);
+    Task MoveColumnAsync(Guid boardId, Guid columnId, int newOrder);
 }

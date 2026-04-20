@@ -180,6 +180,42 @@
         </div>
       </div>
 
+      <!-- Checklist -->
+      <div class="checklist-section">
+        <label>Việc con (Subtasks)</label>
+        
+        <!-- Progress Bar -->
+        @if (task.checklists && task.checklists.length > 0) {
+          <div class="progress-container">
+            <span class="progress-text">{{ checklistProgress }}%</span>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" [style.width.%]="checklistProgress" [class.completed]="checklistProgress === 100"></div>
+            </div>
+          </div>
+        }
+
+        <div class="checklist-list">
+          @for (item of task.checklists; track item.id) {
+            <div class="checklist-item">
+              <input type="checkbox" [checked]="item.isCompleted" (change)="toggleChecklist(item)" class="checklist-checkbox" />
+              <span class="checklist-title" [class.checked]="item.isCompleted">{{ item.title }}</span>
+              <button class="btn-remove-checklist" (click)="deleteChecklist(item.id)">×</button>
+            </div>
+          }
+        </div>
+
+        <div class="add-checklist-container">
+          <input
+            type="text"
+            [(ngModel)]="newChecklistTitle"
+            placeholder="Thêm một mục việc con..."
+            class="checklist-input"
+            (keydown.enter)="addChecklist()"
+          />
+          <button class="btn-secondary btn-sm" (click)="addChecklist()" [disabled]="!newChecklistTitle.trim()">Thêm</button>
+        </div>
+      </div>
+
       <!-- Comments -->
       <div class="comments-section">
         <label>Bình luận ({{ task.commentCount }})</label>

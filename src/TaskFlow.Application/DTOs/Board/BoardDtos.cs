@@ -33,6 +33,14 @@ public class TaskItemDto
     public Guid ColumnId { get; set; }
     public int CommentCount { get; set; }
     public List<TaskLabelDto> Labels { get; set; } = new();
+    public List<TaskChecklistDto> Checklists { get; set; } = new();
+}
+
+public class TaskChecklistDto
+{
+    public Guid Id { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public bool IsCompleted { get; set; }
 }
 
 public class TaskLabelDto
@@ -66,11 +74,23 @@ public class AddCommentRequest
 {
     public string Content { get; set; } = string.Empty;
 }
-public class  AddTaskLabelRequest
+public class AddTaskLabelRequest
 {
     public string Name { get; set; } = string.Empty;
     public string Color { get; set; } = string.Empty;
 }
+
+public class AddChecklistRequest
+{
+    public string Title { get; set; } = string.Empty;
+}
+
+public class UpdateChecklistRequest
+{
+    public string Title { get; set; } = string.Empty;
+    public bool IsCompleted { get; set; }
+}
+
 public class AddColumnRequest
 {
     public string Name { get; set; } = string.Empty;
@@ -91,5 +111,9 @@ public class CreateBoardRequest
 public class MoveTaskRequest
 {
     public Guid TargetColumnId { get; set; }
+    public int NewOrder { get; set; }
+}
+public class MoveColumRequest
+{
     public int NewOrder { get; set; }
 }

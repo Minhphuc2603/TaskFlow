@@ -42,6 +42,13 @@ export interface TaskItem {
   columnId: string;
   commentCount: number;
   labels: TaskLabel[];
+  checklists: TaskChecklist[];
+}
+
+export interface TaskChecklist {
+  id: string;
+  title: string;
+  isCompleted: boolean;
 }
 
 export interface TaskLabel {

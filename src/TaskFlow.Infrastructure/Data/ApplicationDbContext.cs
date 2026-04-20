@@ -19,6 +19,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IUnitOfW
     public DbSet<TaskItem> TaskItems => Set<TaskItem>();
     public DbSet<TaskComment> TaskComments => Set<TaskComment>();
     public DbSet<TaskLabel> TaskLabels => Set<TaskLabel>();
+    public DbSet<TaskChecklist> TaskChecklists => Set<TaskChecklist>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -103,6 +104,18 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IUnitOfW
             entity.HasOne(tl => tl.TaskItem)
                   .WithMany(t => t.Labels)
                   .HasForeignKey(tl => tl.TaskItemId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // TaskChecklist
+        builder.Entity<TaskChecklist>(entity =>
+        {
+            entity.HasKey(tc => tc.Id);
+            entity.Property(tc => tc.Title).IsRequired().HasMaxLength(200);
+
+            entity.HasOne(tc => tc.TaskItem)
+                  .WithMany(t => t.Checklists)
+                  .HasForeignKey(tc => tc.TaskItemId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
     }

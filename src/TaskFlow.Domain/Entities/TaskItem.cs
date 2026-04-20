@@ -17,4 +17,5 @@ public class TaskItem : BaseEntity
     public BoardColumn Column { get; set; } = null!;
     public ICollection<TaskComment> Comments { get; set; } = new List<TaskComment>();
     public ICollection<TaskLabel> Labels { get; set; } = new List<TaskLabel>();
+    public ICollection<TaskChecklist> Checklists { get; set; } = new List<TaskChecklist>();
 }
