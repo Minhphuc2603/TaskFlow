@@ -20,3 +20,12 @@ Thumbs.db
 # Environment
 *.env
 appsettings.Development.json
+
+# Yarn
+yarn.lock
+yarn-error.log
+yarn-debug.log*
+.yarn/cache
+.yarn/unplugged
+.yarn/install-state.gz
+.pnp.*
