@@ -381,6 +381,7 @@
     align-items: center;
     gap: 0.5rem;
     margin-bottom: 0.25rem;
+    flex-wrap: wrap;
 
     .comment-author {
       font-size: 0.8rem;
@@ -392,6 +393,68 @@
       font-size: 0.7rem;
       color: var(--text-muted);
     }
+
+    .comment-actions {
+      display: none;
+      align-items: center;
+      gap: 0.25rem;
+      margin-left: auto;
+    }
+  }
+
+  &:hover .comment-meta .comment-actions {
+    display: flex;
+  }
+
+  .btn-comment-action {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-weight: 500;
+    padding: 0.2rem 0.4rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+
+    &:hover {
+      background: rgba(99, 102, 241, 0.12);
+      color: #818cf8;
+    }
+
+    &.danger:hover {
+      background: rgba(239, 68, 68, 0.12);
+      color: #f87171;
+    }
+  }
+
+  .comment-edit-box {
+    margin-top: 0.4rem;
+
+    .comment-edit-input {
+      width: 100%;
+      background: var(--bg-color);
+      border: 1px solid #6366f1;
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      color: var(--text-primary);
+      font-size: 0.85rem;
+      font-family: inherit;
+      outline: none;
+      resize: none;
+      box-sizing: border-box;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    }
+
+    .comment-edit-actions {
+      display: flex;
+      gap: 0.4rem;
+      margin-top: 0.4rem;
+    }
   }
 
   .comment-content {
@@ -399,6 +462,24 @@
     color: var(--text-secondary);
     margin: 0;
     line-height: 1.5;
+  }
+}
+
+.btn-comment-cancel {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--card-border);
+  color: var(--text-muted);
+  padding: 0.4rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+
+  &:hover {
+    background: rgba(255,255,255,0.1);
+    color: var(--text-primary);
   }
 }
 

@@ -74,6 +74,11 @@ public class AddCommentRequest
 {
     public string Content { get; set; } = string.Empty;
 }
+
+public class UpdateCommentRequest
+{
+    public string Content { get; set; } = string.Empty;
+}
 public class AddTaskLabelRequest
 {
     public string Name { get; set; } = string.Empty;

@@ -54,6 +54,14 @@ export class BoardService {
     return this.http.post<TaskComment>(`${this.apiUrl}/tasks/${taskId}/comments`, { content });
   }
 
+  updateComment(taskId: string, commentId: string, content: string): Observable<TaskComment> {
+    return this.http.put<TaskComment>(`${this.apiUrl}/tasks/${taskId}/comments/${commentId}`, { content });
+  }
+
+  deleteComment(taskId: string, commentId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/tasks/${taskId}/comments/${commentId}`);
+  }
+
   deleteColumn(columnId: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/columns/${columnId}`);
   }

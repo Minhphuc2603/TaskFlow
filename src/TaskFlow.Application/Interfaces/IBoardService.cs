@@ -13,6 +13,8 @@ public interface IBoardService
     Task<TaskItemDto> UpdateTaskAsync(Guid taskId, UpdateTaskRequest request);
     Task<List<TaskCommentDto>> GetCommentsAsync(Guid taskId);
     Task<TaskCommentDto> AddCommentAsync(Guid taskId, string content, string userId, string userName);
+    Task<TaskCommentDto> UpdateCommentAsync(Guid taskId, Guid commentId, string content, string userId);
+    Task DeleteCommentAsync(Guid taskId, Guid commentId, string userId);
     Task DeleteColumnAsync(Guid columnId);
     Task<BoardColumnDto> AddColumnAsync(Guid boardId, string name, string color);
     Task<BoardDto?> GetBoardByColumnIdAsync(Guid columnId);

@@ -128,6 +128,44 @@ public class BoardsController : ControllerBase
         }
     }
 
+    [HttpPut("tasks/{taskId}/comments/{commentId}")]
+    public async Task<ActionResult<TaskCommentDto>> UpdateComment(Guid taskId, Guid commentId, [FromBody] UpdateCommentRequest request)
+    {
+        var userId = GetUserId();
+        try
+        {
+            var comment = await _boardService.UpdateCommentAsync(taskId, commentId, request.Content, userId);
+            return Ok(comment);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return StatusCode(403, new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpDelete("tasks/{taskId}/comments/{commentId}")]
+    public async Task<IActionResult> DeleteComment(Guid taskId, Guid commentId)
+    {
+        var userId = GetUserId();
+        try
+        {
+            await _boardService.DeleteCommentAsync(taskId, commentId, userId);
+            return NoContent();
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return StatusCode(403, new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
     [HttpDelete("columns/{columnId}")]
     public async Task<IActionResult> DeleteColumn(Guid columnId)
     {

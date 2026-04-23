@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TaskItem, TaskComment, Priority, UpdateTaskRequest, ProjectMember } from '../../../../models/project.model';
 import { BoardService } from '../../../../services/board.service';
+import { AuthService } from '../../../../services/auth.service';
 
 @Component({
   selector: 'app-task-detail',
@@ -21,6 +22,8 @@ export class TaskDetailComponent implements OnInit, OnChanges {
   comments = signal<TaskComment[]>([]);
   isLoadingComments = signal(false);
   newComment = '';
+  editingCommentId: string | null = null;
+  editCommentContent = '';
   editingTitle = false;
   editTitle = '';
   editDescription = '';
@@ -46,7 +49,11 @@ export class TaskDetailComponent implements OnInit, OnChanges {
     { value: Priority.Critical, label: 'Khẩn cấp', color: '#ef4444', icon: '⚡' },
   ];
 
-  constructor(private boardService: BoardService) { }
+  constructor(private boardService: BoardService, private authService: AuthService) { }
+
+  get currentUserId(): string | null {
+    return this.authService.currentUser()?.userId ?? null;
+  }
 
   ngOnInit(): void {
     this.syncFromTask();
@@ -129,6 +136,43 @@ export class TaskDetailComponent implements OnInit, OnChanges {
         this.task.commentCount++;
       },
       error: (err) => console.error('Add comment failed', err)
+    });
+  }
+
+  startEditComment(comment: TaskComment) {
+    this.editingCommentId = comment.id;
+    this.editCommentContent = comment.content;
+  }
+
+  saveCommentEdit(comment: TaskComment) {
+    const content = this.editCommentContent.trim();
+    if (!content || content === comment.content) {
+      this.cancelCommentEdit();
+      return;
+    }
+    this.boardService.updateComment(this.task.id, comment.id, content).subscribe({
+      next: (updated) => {
+        this.comments.update(list =>
+          list.map(c => c.id === updated.id ? updated : c)
+        );
+        this.cancelCommentEdit();
+      },
+      error: (err) => console.error('Update comment failed', err)
+    });
+  }
+
+  cancelCommentEdit() {
+    this.editingCommentId = null;
+    this.editCommentContent = '';
+  }
+
+  deleteComment(commentId: string) {
+    this.boardService.deleteComment(this.task.id, commentId).subscribe({
+      next: () => {
+        this.comments.update(list => list.filter(c => c.id !== commentId));
+        this.task.commentCount = Math.max(0, this.task.commentCount - 1);
+      },
+      error: (err) => console.error('Delete comment failed', err)
     });
   }
 

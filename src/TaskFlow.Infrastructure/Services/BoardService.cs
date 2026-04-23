@@ -295,6 +295,46 @@ public class BoardService(ApplicationDbContext context) : IBoardService
         };
     }
 
+    public async Task<TaskCommentDto> UpdateCommentAsync(Guid taskId, Guid commentId, string content, string userId)
+    {
+        var comment = await _context.TaskComments
+            .FirstOrDefaultAsync(c => c.Id == commentId && c.TaskItemId == taskId)
+            ?? throw new Exception("Comment not found.");
+
+        if (comment.UserId != userId)
+            throw new UnauthorizedAccessException("Bạn không có quyền chỉnh sửa bình luận này.");
+
+        comment.Content = content;
+        await _context.SaveChangesAsync();
+
+        var userName = await _context.Users
+            .Where(u => u.Id == userId)
+            .Select(u => u.FullName)
+            .FirstOrDefaultAsync() ?? "Unknown";
+
+        return new TaskCommentDto
+        {
+            Id = comment.Id,
+            Content = comment.Content,
+            UserId = comment.UserId,
+            UserName = userName,
+            CreatedAt = comment.CreatedAt
+        };
+    }
+
+    public async Task DeleteCommentAsync(Guid taskId, Guid commentId, string userId)
+    {
+        var comment = await _context.TaskComments
+            .FirstOrDefaultAsync(c => c.Id == commentId && c.TaskItemId == taskId)
+            ?? throw new Exception("Comment not found.");
+
+        if (comment.UserId != userId)
+            throw new UnauthorizedAccessException("Bạn không có quyền xóa bình luận này.");
+
+        _context.TaskComments.Remove(comment);
+        await _context.SaveChangesAsync();
+    }
+
     public async Task<BoardDto?> GetBoardByColumnIdAsync(Guid columnId)
     {
         var column = await _context.BoardColumns

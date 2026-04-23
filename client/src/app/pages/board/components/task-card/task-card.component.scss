@@ -79,9 +79,44 @@
   .task-title {
     font-size: 0.95rem;
     font-weight: 600;
-    margin: 0 0 0.4rem;
+    margin: 0 0 0.6rem;
     line-height: 1.4;
     color: var(--text-primary);
+  }
+
+  .task-meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-bottom: 0.6rem;
+
+    .priority-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.15rem 0.45rem;
+      border-radius: 5px;
+      letter-spacing: 0.02em;
+    }
+
+    .due-date-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 0.15rem 0.45rem;
+      border-radius: 5px;
+      color: var(--text-muted);
+      background: rgba(255,255,255,0.05);
+
+      &.overdue {
+        color: #f87171;
+        background: rgba(239, 68, 68, 0.12);
+      }
+    }
   }
 
   .task-desc {
@@ -97,9 +132,45 @@
 
   .task-footer {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     align-items: center;
-    margin-top: 0.5rem;
+    margin-top: 0.4rem;
+
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+
+      .checklist-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.2rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        padding: 0.12rem 0.35rem;
+        border-radius: 5px;
+        background: rgba(255,255,255,0.05);
+
+        &.all-done {
+          color: #22c55e;
+          background: rgba(34, 197, 94, 0.12);
+        }
+      }
+
+      .comments-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.2rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        padding: 0.12rem 0.35rem;
+        border-radius: 5px;
+        background: rgba(255,255,255,0.05);
+      }
+    }
 
     .assignee-chip {
       display: flex;
@@ -124,45 +195,10 @@
 
     .chip-name {
       font-weight: 500;
-      max-width: 100px;
+      max-width: 80px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-    }
-
-    .footer-left {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-
-      .comments {
-        display: flex;
-        align-items: center;
-        gap: 0.25rem;
-        color: var(--text-muted);
-        font-size: 0.75rem;
-        font-weight: 500;
-        
-        svg {
-          opacity: 0.7;
-        }
-      }
-    }
-
-    .footer-right {
-      .assignee-avatar {
-        width: 24px;
-        height: 24px;
-        border-radius: 12px;
-        background: rgba(99, 102, 241, 0.2);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.65rem;
-        font-weight: 600;
-        color: #818cf8;
-        border: 1px solid rgba(99, 102, 241, 0.3);
-      }
     }
   }
 }
