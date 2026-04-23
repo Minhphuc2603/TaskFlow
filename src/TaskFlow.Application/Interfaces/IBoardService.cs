@@ -24,4 +24,5 @@ public interface IBoardService
     Task<TaskChecklistDto> UpdateChecklistAsync(Guid taskId, Guid checklistId, string title, bool isCompleted);
     Task DeleteChecklistAsync(Guid taskId, Guid checklistId);
     Task MoveColumnAsync(Guid boardId, Guid columnId, int newOrder);
+    Task<BoardColumnDto> UpdateColumnAsync(Guid columnId, string name, string color);
 }

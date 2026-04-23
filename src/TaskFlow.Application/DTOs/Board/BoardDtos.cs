@@ -122,3 +122,9 @@ public class MoveColumRequest
 {
     public int NewOrder { get; set; }
 }
+public class UpdateColumnRequest
+{
+    public string Name { get; set; } = string.Empty;
+    public string Color { get; set; } = string.Empty;
+
+}

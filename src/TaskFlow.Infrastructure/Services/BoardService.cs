@@ -551,4 +551,21 @@ public class BoardService(ApplicationDbContext context) : IBoardService
         await _context.SaveChangesAsync();
     }
 
+    public async Task<BoardColumnDto> UpdateColumnAsync(Guid columnId, string name, string color)
+    {
+        var column = await _context.BoardColumns.FindAsync(columnId)
+            ?? throw new Exception("Column not found");
+        column.Name = name;
+        column.Color = color;
+        await _context.SaveChangesAsync();
+        return new BoardColumnDto
+        {
+            Id = column.Id,
+            Name = column.Name,
+            Color= column.Color,
+            Order = column.Order,
+            Tasks = []
+        };
+
+    }
 }

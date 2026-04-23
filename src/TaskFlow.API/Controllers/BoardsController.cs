@@ -292,4 +292,25 @@ public class BoardsController : ControllerBase
             return BadRequest(new { message = ex.Message });
         }
     }
+    [HttpPut("columns/{columnId}")]
+    public async Task<ActionResult<BoardColumnDto>> UpdateColumn(Guid columnId, [FromBody] UpdateColumnRequest request)
+    {
+        var board = await _boardService.GetBoardByColumnIdAsync(columnId);
+        if (board != null)
+        {
+            var role = await _projectService.GetUserRoleAsync(board.ProjectId, GetUserId());
+            if (role != "Owner")
+                return StatusCode(403, new { message = "Chỉ chủ sở hữu mới có thể sửa tên cột." });
+        }
+        try
+        {
+            var column = await _boardService.UpdateColumnAsync(columnId, request.Name, request.Color);
+            return Ok(column);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
 }
